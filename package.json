@@ -1,0 +1,52 @@
+{
+  "name": "@convoy/dapper",
+  "version": "1.0.0",
+  "description": "Styling library",
+  "license": "UNLICENSED",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/src/index.js",
+  "repository": "convoyinc/dapper",
+  "scripts": {
+    "clean": "./scripts/clean.sh",
+    "compile": "./scripts/compile.sh",
+    "release": "./scripts/release.sh",
+    "start": "./scripts/start.sh",
+    "test": "./scripts/test.sh",
+    "test:coverage": "./scripts/test:coverage.sh",
+    "test:style": "./scripts/test:style.sh",
+    "test:unit": "./scripts/test:unit.sh"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "tslib": "1.4.0"
+  },
+  "devDependencies": {
+    "@types/chai": "3.4.34",
+    "@types/classnames": "0.0.32",
+    "@types/lodash": "^4.14.50",
+    "@types/mocha": "2.2.34",
+    "@types/node": "6.0.52",
+    "@types/react": "^15.0.4",
+    "@types/react-dom": "^0.14.21",
+    "@types/sinon": "1.16.33",
+    "@types/sinon-chai": "2.7.27",
+    "apollo-client": "^0.7.3",
+    "chai": "3.5.0",
+    "classnames": "^2.2.5",
+    "codecov": "1.0.1",
+    "mocha": "3.2.0",
+    "mocha-circleci-reporter": "0.0.2",
+    "nyc": "10.0.0",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "sinon": "1.17.6",
+    "sinon-chai": "2.8.0",
+    "ts-node": "1.7.2",
+    "tslint": "4.1.1",
+    "typescript": "2.1.5"
+  },
+  "typings": "./src/index.ts"
+}
