@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
 
-import dapper from '../../src/styles';
+import StyleSheet from '../../src/styles';
 
 export interface Props {
   isCool: boolean;
@@ -26,7 +26,7 @@ export interface State {
 //   },
 // });
 
-const STYLES = {
+const STYLES = StyleSheet.create({
   root: {
     background: 'red',
     ':hover': {
@@ -53,7 +53,7 @@ const STYLES = {
   blah: {
     border: '1px solid black',
   },
-};
+});
 
 const MODES = {
   isCool: (props: Props) => props.isCool,
@@ -62,11 +62,11 @@ const MODES = {
 
 export default class Component extends React.Component<Props, State> {
 
-  styles = dapper(STYLES, MODES, this);
-
   render(): JSX.Element {
+    const styles = StyleSheet.compute(STYLES, MODES, this.props, this.state);
+
     return (
-      <div className={classnames(this.styles.root, this.styles.blah)} />
+      <div className={classnames(styles.root, styles.blah)} />
     );
   }
 }

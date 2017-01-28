@@ -1,29 +1,31 @@
 import * as _ from 'lodash';
-import * as React from 'react';
-
-export type CompiledStyleSheet<Keys extends string> = {
-  [Key in Keys]: CompiledStyle;
-};
-
-export type CompiledStyle = string;
+import create, { CompiledStyle } from './create';
 
 export type ModeResolver<P, S> = {[key: string]: (props: P, state: S) => boolean};
 
-export default function dapper<Styles extends Object, Props, State>(
-  styles: Styles,
-  modeResolver: ModeResolver<Props, State>,
-  instance: React.Component<Props, State>,
-): CompiledStyleSheet<keyof Styles> {
+export type ComputedStyleSheet<Keys extends string> = {
+  [Key in Keys]: ComputedStyle;
+};
 
-  const x = {};
-  _.forEach(styles, (_style, key: string) => {
-    Object.defineProperty(x, key, {
-      get() {
-        modeResolver[key](instance.props, instance.state);
-        return 'a';
-      },
-    });
-  });
+export type ComputedStyle = string;
 
-  return x as CompiledStyleSheet<keyof Styles>;
-}
+export default {
+  create,
+
+  compute<Styles extends Object, Props, State>(
+    compiledStyles: Styles,
+    modeResolver: ModeResolver<Props, State>,
+    props: Props,
+    state: State,
+  ): ComputedStyleSheet<keyof Styles> {
+    const modes = _.mapValues(modeResolver, resolver => resolver(props, state));
+
+    return _.mapValues(compiledStyles, (style: CompiledStyle) => {
+      if (typeof style === 'string') {
+        return style;
+      } else {
+        return style(modes);
+      }
+    }) as any;
+  },
+};
