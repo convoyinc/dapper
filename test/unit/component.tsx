@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
 
-import StyleSheet from '../../src/styles';
+import StyleSheet from '../../src';
 
 export interface Props {
   isCool: boolean;

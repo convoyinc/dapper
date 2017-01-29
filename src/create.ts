@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 import hyphenateStyleName from 'hyphenate-style-name';
 
+import { _renderToNode } from './render-to';
+
 export type CompiledStyleSheet<Keys extends string> = {
   [Key in Keys]: CompiledStyle;
 };
@@ -67,8 +69,7 @@ function renderStyle(
   const selector = generateCSSSelector(classNames, pseudo);
   const media = generateCombinedMediaQuery(medias);
   const cssRule = generateCSSRule(selector, declarations.join(';'), media);
-  // TODO: Insert rule into stylesheet
-  node.sheet.insertRule(cssRule, node.sheet.cssRules.length);
+  _renderToNode(cssRule);
 }
 
 function isPseudo(property: string) {
