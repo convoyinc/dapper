@@ -15,73 +15,45 @@ export type Style = {[key: string]: string|Object};
 
 let uniqueRuleIdentifier = 0;
 
-
 export default function create<Styles extends Object>(
   styles: Styles,
 ): CompiledStyleSheet<keyof Styles> {
   return _.mapValues(styles, style => renderStyleToReducer(style)) as any;
 }
 
-
-const [base, others] = _.partition(style, modesOrMediaOrSelector);
-if (base has keys) {
-  generate(className, base);
+function renderStyleToReducer(style: Style) {
+  const classNames = [generateClassName(++uniqueRuleIdentifier)];
+  const classNamesForModes = {};
+  renderStyle(style, classNames, classNamesForModes, '', []);
+  return getCompiledStyle(classNames, classNamesForModes);
 }
 
-getCompiledStyle('abc', { isCool: 'def' });
-
-const styles: Object = {
-  x: { // .abc
-    color: 'red',
-    ':hover': { // .abc:hover
-      color: 'blue',
-      $isCool: { // .abc.def:hover
-        width: 10,
-      },
-    },
-    $isCool: { // .abc.def
-      background: 'blue',
-      '@media (min-width: 300px)': { // @media ... { .abc.def }
-        background: 'red',
-      },
-      $blah: { // .abc.def.fgh
-        background: 'black',
-        '@media (min-width: 300px)': { // @media ... { .abc.def }
-          $hovered: { // @media ... { abc.def.ghi }
-
-          }
-        },
-      },
-    },
-    $blah: { // .fgh
-      background: 'green',
-    },
-  },
-  y: { // .ijk
-    $isCool: { // .ijk.def
-
-    }
-  }
-};
-
-function renderStyleToReducer(style: Style, pseudo = '', media = '') {
-  const className = generateClassName(++uniqueRuleIdentifier);
-  const classNamesForModes: {[key: string]: string} = {};
+function renderStyle(
+  style: Style,
+  classNames: string[],
+  classNamesForModes: {[key: string]: string},
+  pseudo: string,
+  medias: string[],
+) {
 
   const declarations = [];
   for (const property in style) {
     const value = style[property];
     if (value instanceof Object) {
       if (isPseudo(property)) {
-        doBlah(className, pseudo + property, media);
-
+        renderStyle(value as Style, classNames, classNamesForModes, pseudo + property, medias);
 
       } else if (isMediaQuery(property)) {
-        property.slice(6).trim();
-        doBlah()
+        const media = property.slice(6).trim();
+        renderStyle(value as Style, classNames, classNamesForModes, pseudo + property, medias.concat(media));
 
       } else if (isMode(property)) {
-        doBlah()
+        const mode = property.slice(1);
+        let modeClassName = classNamesForModes[mode];
+        if (!modeClassName) {
+          modeClassName = classNamesForModes[mode] = generateClassName(++uniqueRuleIdentifier);
+        }
+        renderStyle(value as Style, classNames.concat(modeClassName), classNamesForModes, pseudo, medias);
 
       } else {
         throw new Error(`Invalid style for property ${property}`);
@@ -91,11 +63,12 @@ function renderStyleToReducer(style: Style, pseudo = '', media = '') {
       declarations.push(cssDeclaration);
     }
   }
-  // TODO: Insert rule into stylesheet
-  // const selector = generateCSSSelector(className, pseudo);
-  // const cssRule = generateCSSRule(selector, declarations.join(';'));
 
-  return getCompiledStyle(className, classNamesForModes);
+  const selector = generateCSSSelector(classNames, pseudo);
+  const media = generateCombinedMediaQuery(medias);
+  const cssRule = generateCSSRule(selector, declarations.join(';'), media);
+  // TODO: Insert rule into stylesheet
+  node.sheet.insertRule(cssRule, node.sheet.cssRules.length);
 }
 
 function isPseudo(property: string) {
@@ -110,18 +83,18 @@ function isMode(property: string) {
   return property.charAt(0) === '$';
 }
 
-function getCompiledStyle(className: string, classNamesForModes: {[key: string]: string}) {
+function getCompiledStyle(classNames: string[], classNamesForModes: {[key: string]: string}) {
   if (!Object.keys(classNamesForModes).length) {
-    return className;
+    return classNames.join(' ');
   } else {
     return function styleReducer(modes: ModeResolver) {
-      const classNames = [className];
+      const names = classNames.slice(0);
       for (const mode in modes) {
         if (modes[mode]) {
-          classNames.push(classNamesForModes[mode]);
+          names.push(classNamesForModes[mode]);
         }
       }
-      return classNames.join(' ');
+      return names.join(' ');
     };
   }
 }
@@ -129,7 +102,7 @@ function getCompiledStyle(className: string, classNamesForModes: {[key: string]:
 const CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const CHAR_LENGTH = CHARS.length;
 
-function generateClassName(id: number, className = '') {
+function generateClassName(id: number, className = ''): string {
   if (id <= CHAR_LENGTH) {
     return CHARS[id - 1] + className;
   }
@@ -138,21 +111,25 @@ function generateClassName(id: number, className = '') {
   return generateClassName(id / CHAR_LENGTH | 0, CHARS[id % CHAR_LENGTH] + className);
 }
 
-export default function generateCSSDeclaration(property: string, value: string|number) {
+export function generateCSSDeclaration(property: string, value: string|number) {
   return `${hyphenateStyleName(property)}:${value}`;
 }
 
-export default function getCSSSelector(className: string, pseudo = '') {
-  return `.${className}${pseudo}`;
+export function generateCSSSelector(classNames: string[], pseudo = '') {
+  return `${classNames.map(cn => `.${cn}`).join('')}${pseudo}`;
 }
 
-export default function generateCSSRule(selector: string, cssDeclaration: string) {
-  return `${selector}{${cssDeclaration}}`;
-}
-
-export default function generateCombinedMediaQuery(currentMediaQuery: string, nestedMediaQuery: string) {
-  if (currentMediaQuery.length === 0) {
-    return nestedMediaQuery;
+export function generateCSSRule(selector: string, cssDeclaration: string, mediaQuery: string|null) {
+  let rule = `${selector}{${cssDeclaration}}`;
+  if (mediaQuery) {
+    rule = `${mediaQuery}{${rule}}`;
   }
-  return `${currentMediaQuery} and ${nestedMediaQuery}`;
+  return rule;
+}
+
+export function generateCombinedMediaQuery(medias: string[]) {
+  if (medias.length === 0) {
+    return null;
+  }
+  return `@media ${medias.join(' and ')}`;
 }
