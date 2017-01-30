@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import hyphenateStyleName from 'hyphenate-style-name';
+import * as hyphenateStyleName from 'hyphenate-style-name';
 
 import { _renderToNode } from './render-to';
 

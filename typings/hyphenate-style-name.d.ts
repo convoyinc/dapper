@@ -1,4 +1,6 @@
 
 declare module 'hyphenate-style-name' {
-  export default function hyphenateStyleName(property:string):string;
+  namespace hyphenateStyleName {}
+  function hyphenateStyleName(property:string):string;
+  export = hyphenateStyleName;
 }
