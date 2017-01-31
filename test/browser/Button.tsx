@@ -14,10 +14,13 @@ export interface State {
 }
 
 // TODO unitless px
-// other plugins?
+// media queries in order
+// hot module reloading
+// other plugins? prefixing
 // keyframes
 // addCSS
-// more complex classNames
+// friendly classNames
+//
 
 // const fadeOut = dapper.keyframes({
 //   '0%': {
