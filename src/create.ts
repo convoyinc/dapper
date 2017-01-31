@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as hyphenateStyleName from 'hyphenate-style-name';
 
-import { _renderToNode } from './render-to';
+import { config, _renderToNode } from './configure';
 
 export type CompiledStyleSheet<Keys extends string> = {
   [Key in Keys]: CompiledStyle;
@@ -24,7 +24,7 @@ export default function create<Styles extends Object>(
 }
 
 function renderStyleToReducer(style: Style) {
-  const classNames = [generateClassName(++uniqueRuleIdentifier)];
+  const classNames = [generateClassName()];
   const classNamesForModes = {};
   renderStyle(style, classNames, classNamesForModes, '', []);
   return getCompiledStyle(classNames, classNamesForModes);
@@ -46,14 +46,15 @@ function renderStyle(
         renderStyle(value as Style, classNames, classNamesForModes, pseudo + property, medias);
 
       } else if (isMediaQuery(property)) {
+        // TODO: Must output in order
         const media = property.slice(6).trim();
-        renderStyle(value as Style, classNames, classNamesForModes, pseudo + property, medias.concat(media));
+        renderStyle(value as Style, classNames, classNamesForModes, pseudo, medias.concat(media));
 
       } else if (isMode(property)) {
         const mode = property.slice(1);
         let modeClassName = classNamesForModes[mode];
         if (!modeClassName) {
-          modeClassName = classNamesForModes[mode] = generateClassName(++uniqueRuleIdentifier);
+          modeClassName = classNamesForModes[mode] = generateClassName();
         }
         renderStyle(value as Style, classNames.concat(modeClassName), classNamesForModes, pseudo, medias);
 
@@ -68,6 +69,7 @@ function renderStyle(
 
   const selector = generateCSSSelector(classNames, pseudo);
   const media = generateCombinedMediaQuery(medias);
+  console.log(classNames, pseudo, declarations, media);
   const cssRule = generateCSSRule(selector, declarations.join(';'), media);
   _renderToNode(cssRule);
 }
@@ -103,13 +105,17 @@ function getCompiledStyle(classNames: string[], classNamesForModes: {[key: strin
 const CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const CHAR_LENGTH = CHARS.length;
 
-function generateClassName(id: number, className = ''): string {
+function generateClassName() {
+  return config.classNamePrefix + _generateClassName(++uniqueRuleIdentifier);
+}
+
+function _generateClassName(id: number, className = ''): string {
   if (id <= CHAR_LENGTH) {
     return CHARS[id - 1] + className;
   }
 
   // Bitwise floor as safari performs much faster https://jsperf.com/math-floor-vs-math-round-vs-parseint/55
-  return generateClassName(id / CHAR_LENGTH | 0, CHARS[id % CHAR_LENGTH] + className);
+  return _generateClassName(id / CHAR_LENGTH | 0, CHARS[id % CHAR_LENGTH] + className);
 }
 
 export function generateCSSDeclaration(property: string, value: string|number) {

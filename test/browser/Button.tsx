@@ -46,10 +46,13 @@ const STYLES = StyleSheet.create({
         backgroundColor: '#000045',
       },
     },
+    '@media (max-width: 800px)': {
+      width: '100px',
+    },
     $ghost: {
       backgroundColor: 'white',
-      '@media screen and (max-width: 800px)': {
-        width: '100px',
+      '@media (max-width: 800px)': {
+        backgroundColor: '#DDD',
       },
       $large: {
         border: '1px solid #000',
@@ -62,6 +65,9 @@ const STYLES = StyleSheet.create({
     $hovered: {
       borderRight: '1px solid #000',
     },
+  },
+  text: {
+    display: 'inline-block',
   },
 });
 
@@ -86,8 +92,16 @@ export default class Button extends React.Component<Props, State> {
         onMouseEnter={this._onMouseEnter}
         onMouseLeave={this._onMouseLeave}
       >
-        Button
+        {this._renderText()}
       </div>
+    );
+  }
+
+  _renderText() {
+    return (
+      <span>
+        Button
+      </span>
     );
   }
 
