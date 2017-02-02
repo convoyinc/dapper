@@ -1,4 +1,4 @@
-import isUnitlessCSSProperty from 'unitless-css-property';
+import * as isUnitlessCSSProperty from 'unitless-css-property';
 
 import { Style } from '../types';
 
