@@ -1,13 +1,9 @@
 import * as _ from 'lodash';
-import { CompiledStyle } from './create';
-
-export type ModeResolver<P, S> = {[key: string]: (props: P, state: S) => boolean};
-
-export type ComputedStyleSheet<Keys extends string> = {
-  [Key in Keys]: ComputedStyle;
-};
-
-export type ComputedStyle = string;
+import {
+  CompiledStyle,
+  ModeResolver,
+  ComputedStyleSheet,
+} from './types';
 
 export default function compute<Styles extends Object, Props, State>(
   compiledStyles: Styles,

@@ -1,19 +1,13 @@
 import * as _ from 'lodash';
 import * as hyphenateStyleName from 'hyphenate-style-name';
 
-import { config, _renderToNode } from './configure';
-
-export type CompiledStyleSheet<Keys extends string> = {
-  [Key in Keys]: CompiledStyle;
-};
-
-export type CompiledStyle = string | StyleReducer;
-
-export type ModeResolver = {[key: string]: boolean};
-
-export type StyleReducer = (modes: ModeResolver) => string;
-
-export type Style = {[key: string]: string|Object};
+import { config } from './configure';
+import { unit } from './plugins';
+import {
+  CompiledStyleSheet,
+  ClassNameResolver,
+  Style,
+} from './types';
 
 let uniqueRuleIdentifier = 0;
 
@@ -37,16 +31,18 @@ function renderStyle(
   pseudo: string,
   medias: string[],
 ) {
-
-  const declarations = [];
+  unit(style);
+  const declarations: string[] = [];
   for (const property in style) {
     const value = style[property];
     if (value instanceof Object) {
+      // Render all previous items
+      renderToNode(classNames, pseudo, medias, declarations);
+
       if (isPseudo(property)) {
         renderStyle(value as Style, classNames, classNamesForModes, pseudo + property, medias);
 
       } else if (isMediaQuery(property)) {
-        // TODO: Must output in order
         const media = property.slice(6).trim();
         renderStyle(value as Style, classNames, classNamesForModes, pseudo, medias.concat(media));
 
@@ -66,12 +62,23 @@ function renderStyle(
       declarations.push(cssDeclaration);
     }
   }
+  renderToNode(classNames, pseudo, medias, declarations);
+}
 
+function renderToNode(classNames: string[], pseudo: string, medias: string[], declarations: string[]) {
+  if (!declarations.length) return;
   const selector = generateCSSSelector(classNames, pseudo);
   const media = generateCombinedMediaQuery(medias);
-  console.log(classNames, pseudo, declarations, media);
   const cssRule = generateCSSRule(selector, declarations.join(';'), media);
-  _renderToNode(cssRule);
+
+  if (!config.node.parentNode) {
+    document.head.appendChild(config.node);
+  }
+  if (process.env.NODE_ENV === 'production') {
+    config.node.sheet.insertRule(cssRule, config.node.sheet.cssRules.length);
+  } else {
+    config.node.textContent += cssRule + '\n';
+  }
 }
 
 function isPseudo(property: string) {
@@ -90,7 +97,7 @@ function getCompiledStyle(classNames: string[], classNamesForModes: {[key: strin
   if (!Object.keys(classNamesForModes).length) {
     return classNames.join(' ');
   } else {
-    return function styleReducer(modes: ModeResolver) {
+    return function styleReducer(modes: ClassNameResolver) {
       const names = classNames.slice(0);
       for (const mode in modes) {
         if (modes[mode]) {

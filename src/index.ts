@@ -7,5 +7,3 @@ export default {
   create,
   configure,
 };
-
-export { CompiledStyleSheet } from './create';

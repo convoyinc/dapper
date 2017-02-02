@@ -20,7 +20,6 @@ export interface State {
 // keyframes
 // addCSS
 // friendly classNames
-//
 
 // const fadeOut = dapper.keyframes({
 //   '0%': {
@@ -81,17 +80,20 @@ const MODES = {
 };
 
 export default class Button extends React.Component<Props, State> {
-
   state = {
     hovered: false,
   };
 
-  render(): JSX.Element {
-    const styles = StyleSheet.compute(STYLES, MODES, this.props, this.state);
+  styles = StyleSheet.compute(STYLES, MODES, this.props, this.state);
 
+  componentWillUpdate(nextProps: Props, nextState: State) {
+    this.styles = StyleSheet.compute(STYLES, MODES, nextProps, nextState);
+  }
+
+  render(): JSX.Element {
     return (
       <div
-        className={classnames(styles.root, this.props.className)}
+        className={classnames(this.styles.root, this.props.className)}
         onMouseEnter={this._onMouseEnter}
         onMouseLeave={this._onMouseLeave}
       >
@@ -102,7 +104,7 @@ export default class Button extends React.Component<Props, State> {
 
   _renderText() {
     return (
-      <span>
+      <span className={this.styles.text}>
         Button
       </span>
     );
