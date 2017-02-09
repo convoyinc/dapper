@@ -13,12 +13,13 @@ export interface State {
   hovered: boolean;
 }
 
-// TODO unitless px
+// unitless px
 // media queries in order
-// hot module reloading
+// TODO
 // other plugins? prefixing
 // keyframes
 // addCSS
+// hot module reloading
 // friendly classNames
 
 // const fadeOut = dapper.keyframes({
@@ -38,7 +39,7 @@ export interface State {
 
 const STYLES = StyleSheet.create({
   root: {
-    display: 'inline-block',
+    display: 'flex',
     backgroundColor: '#BBB',
     padding: '8px',
     width: '200px',

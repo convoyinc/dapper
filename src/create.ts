@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as hyphenateStyleName from 'hyphenate-style-name';
 
 import { config } from './configure';
-import { unit } from './plugins';
+import { prefixer, unit } from './plugins';
 import {
   CompiledStyleSheet,
   ClassNameResolver,
@@ -31,7 +31,8 @@ function renderStyle(
   pseudo: string,
   medias: string[],
 ) {
-  unit(style);
+  style = unit(style);
+  style = prefixer(style);
   const declarations: string[] = [];
   for (const property in style) {
     const value = style[property];
