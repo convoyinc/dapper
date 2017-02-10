@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
-import * as hyphenateStyleName from 'hyphenate-style-name';
 
 import { config } from './configure';
 import { prefixer, unit } from './plugins';
+import generateCSSDeclaration from './generateCSSDeclaration';
+import renderCSSText from './renderCSSText';
 import {
   CompiledStyleSheet,
   ClassNameResolver,
@@ -33,12 +34,14 @@ function renderStyle(
 ) {
   style = unit(style);
   style = prefixer(style);
-  const declarations: string[] = [];
+
+  let declarations: string[] = [];
   for (const property in style) {
     const value = style[property];
-    if (value instanceof Object) {
+    if (value instanceof Object && !Array.isArray(value)) {
       // Render all previous items
       renderToNode(classNames, pseudo, medias, declarations);
+      declarations = [];
 
       if (isPseudo(property)) {
         renderStyle(value as Style, classNames, classNamesForModes, pseudo + property, medias);
@@ -56,8 +59,13 @@ function renderStyle(
         renderStyle(value as Style, classNames.concat(modeClassName), classNamesForModes, pseudo, medias);
 
       } else {
-        throw new Error(`Invalid style for property ${property}`);
+        throw new Error(`Invalid style for property ${property}: ${value}`);
       }
+    } else if (Array.isArray(value)) {
+      value.map(val => {
+        const cssDeclaration = generateCSSDeclaration(property, val);
+        declarations.push(cssDeclaration);
+      });
     } else {
       const cssDeclaration = generateCSSDeclaration(property, value);
       declarations.push(cssDeclaration);
@@ -75,11 +83,7 @@ function renderToNode(classNames: string[], pseudo: string, medias: string[], de
   if (!config.node.parentNode) {
     document.head.appendChild(config.node);
   }
-  if (process.env.NODE_ENV === 'production') {
-    config.node.sheet.insertRule(cssRule, config.node.sheet.cssRules.length);
-  } else {
-    config.node.textContent += cssRule + '\n';
-  }
+  renderCSSText(cssRule);
 }
 
 function isPseudo(property: string) {
@@ -124,10 +128,6 @@ function _generateClassName(id: number, className = ''): string {
 
   // Bitwise floor as safari performs much faster https://jsperf.com/math-floor-vs-math-round-vs-parseint/55
   return _generateClassName(id / CHAR_LENGTH | 0, CHARS[id % CHAR_LENGTH] + className);
-}
-
-export function generateCSSDeclaration(property: string, value: string|number) {
-  return `${hyphenateStyleName(property)}:${value}`;
 }
 
 export function generateCSSSelector(classNames: string[], pseudo = '') {

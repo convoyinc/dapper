@@ -15,34 +15,37 @@ export interface State {
 
 // unitless px
 // media queries in order
-// TODO
-// other plugins? prefixing
+// prefixing
 // keyframes
+// TODO
 // addCSS
 // hot module reloading
 // friendly classNames
+// testing
+// reverse lookup of styles from className
 
-// const fadeOut = dapper.keyframes({
-//   '0%': {
-//     opacity: 1,
-//   },
-//   '100%': {
-//     opacity: 0,
-//   },
-// });
+const fadeOut = StyleSheet.keyframes({
+  '0%': {
+    opacity: 0,
+  },
+  '100%': {
+    opacity: 1,
+  },
+});
 
-// dapper.addCSS({
-//   '.box': {
-//     '-webkit-scrollbar': 'none',
-//   },
-// });
+StyleSheet.renderStatic({
+  'html, body': {
+    backgroundColor: '#DDD',
+  },
+});
 
 const STYLES = StyleSheet.create({
   root: {
     display: 'flex',
     backgroundColor: '#BBB',
-    padding: '8px',
+    padding: 8,
     width: '200px',
+    animation: `5s ${fadeOut} linear`,
     ':hover': {
       backgroundColor: '#555',
       $ghost: {
