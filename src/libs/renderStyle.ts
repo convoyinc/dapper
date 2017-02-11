@@ -1,5 +1,5 @@
 import { config } from '../configure';
-import { prefixer, unit } from '../plugins';
+import applyPlugins from '../plugins';
 import generateCSSDeclaration from './generateCSSDeclaration';
 import renderCSSText from './renderCSSText';
 import generateClassName from './generateClassName';
@@ -14,8 +14,7 @@ export default function renderStyle(
   pseudo: string,
   medias: string[],
 ) {
-  style = unit(style);
-  style = prefixer(style);
+  style = applyPlugins(style);
 
   let declarations: string[] = [];
   for (const property in style) {
@@ -44,13 +43,9 @@ export default function renderStyle(
         throw new Error(`Invalid style for property ${property}: ${value}`);
       }
     } else if (Array.isArray(value)) {
-      value.map(val => {
-        const cssDeclaration = generateCSSDeclaration(property, val);
-        declarations.push(cssDeclaration);
-      });
+      value.map(val => declarations.push(generateCSSDeclaration(property, val)));
     } else {
-      const cssDeclaration = generateCSSDeclaration(property, value);
-      declarations.push(cssDeclaration);
+      declarations.push(generateCSSDeclaration(property, value));
     }
   }
   renderToNode(classNames, pseudo, medias, declarations);

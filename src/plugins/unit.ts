@@ -4,15 +4,15 @@ import { Style } from '../types';
 
 export default function addUnit(style: Style, unit = 'px') {
   for (const property in style) {
-    if (!isUnitlessCSSProperty(property)) {
-      const cssValue = style[property];
-      if (Array.isArray(cssValue)) {
-        style[property] = cssValue.map(val => addUnitIfNeeded(val, unit));
-      } else if (cssValue instanceof Object) {
-        style[property] = addUnit(cssValue as Style, unit);
-      } else {
-        style[property] = addUnitIfNeeded(cssValue, unit);
-      }
+    if (isUnitlessCSSProperty(property)) continue;
+
+    const cssValue = style[property];
+    if (Array.isArray(cssValue)) {
+      style[property] = cssValue.map(val => addUnitIfNeeded(val, unit));
+    } else if (cssValue instanceof Object) {
+      style[property] = addUnit(cssValue as Style, unit);
+    } else {
+      style[property] = addUnitIfNeeded(cssValue, unit);
     }
   }
 

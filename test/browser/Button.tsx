@@ -15,16 +15,11 @@ export interface State {
 
 export type ModeState = { props: Props, state: State };
 
-// unitless px
-// media queries in order
-// prefixing
-// keyframes
-// renderStatic
 // TODO
-// hot module reloading
-// friendly classNames
 // testing
+// HMR
 // reverse lookup of styles from className
+// friendly classNames
 
 const fadeOut = StyleSheet.keyframes({
   '0%': {
