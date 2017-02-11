@@ -13,12 +13,14 @@ export interface State {
   hovered: boolean;
 }
 
+export type ModeState = { props: Props, state: State };
+
 // unitless px
 // media queries in order
 // prefixing
 // keyframes
+// renderStatic
 // TODO
-// addCSS
 // hot module reloading
 // friendly classNames
 // testing
@@ -35,7 +37,10 @@ const fadeOut = StyleSheet.keyframes({
 
 StyleSheet.renderStatic({
   'html, body': {
-    backgroundColor: '#DDD',
+    backgroundColor: '#CCFFFF',
+    '@media (max-width: 800px)': {
+      backgroundColor: '#FFCCFF',
+    },
   },
 });
 
@@ -78,9 +83,9 @@ const STYLES = StyleSheet.create({
 });
 
 const MODES = {
-  large: (props: Props) => !!props.large,
-  hovered: (_props: Props, state: State) => state.hovered,
-  ghost: (props: Props) => !!props.ghost,
+  large: ({ props }: ModeState) => !!props.large,
+  hovered: ({ state }: ModeState) => state.hovered,
+  ghost: ({ props }: ModeState) => !!props.ghost,
 };
 
 export default class Button extends React.Component<Props, State> {
@@ -88,10 +93,10 @@ export default class Button extends React.Component<Props, State> {
     hovered: false,
   };
 
-  styles = StyleSheet.compute(STYLES, MODES, this.props, this.state);
+  styles = StyleSheet.compute(STYLES, MODES, { props: this.props, state: this.state });
 
-  componentWillUpdate(nextProps: Props, nextState: State) {
-    this.styles = StyleSheet.compute(STYLES, MODES, nextProps, nextState);
+  componentWillUpdate(props: Props, state: State) {
+    this.styles = StyleSheet.compute(STYLES, MODES, { props, state });
   }
 
   render(): JSX.Element {

@@ -1,7 +1,7 @@
 import { config } from './configure';
-import generateCSSDeclaration from './generateCSSDeclaration';
 import { Style } from './types';
-import renderCSSText from './renderCSSText';
+import renderCSSText from './libs/renderCSSText';
+import cssifyObject from './libs/cssifyObject';
 
 let uniqueKeyframeIdentifier = 0;
 
@@ -28,19 +28,4 @@ function cssifyKeyframe(frames: KeyFrames, animationName: string) {
 
 function generateAnimationName(id: number) {
   return `${config.classNamePrefix}anim_${id}`;
-}
-
-function cssifyObject(style: Style) {
-  const declarations: string[] = [];
-
-  for (const property in style) {
-    const value = style[property];
-    if (typeof value !== 'string' && typeof value !== 'number') {
-      throw new Error(`The invalid value \`${value}\` has been used as \`${property}\`.`);
-    }
-
-    declarations.push(generateCSSDeclaration(property, value));
-  }
-
-  return declarations.join(';');
 }

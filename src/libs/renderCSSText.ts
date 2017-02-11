@@ -1,4 +1,4 @@
-import { config } from './configure';
+import { config } from '../configure';
 
 export default function renderCSSText(cssText: string) {
   if (process.env.NODE_ENV === 'production') {

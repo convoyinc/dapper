@@ -5,13 +5,12 @@ import {
   ComputedStyleSheet,
 } from './types';
 
-export default function compute<Styles extends Object, Props, State>(
+export default function compute<Styles extends Object, State>(
   compiledStyles: Styles,
-  modeResolver: ModeResolver<Props, State>,
-  props: Props,
+  modeResolver: ModeResolver<State>,
   state: State,
 ): ComputedStyleSheet<keyof Styles> {
-  const modes = _.mapValues(modeResolver, resolver => resolver(props, state));
+  const modes = _.mapValues(modeResolver, resolver => resolver(state));
 
   return _.mapValues(compiledStyles, (style: CompiledStyle) => {
     if (typeof style === 'string') {
