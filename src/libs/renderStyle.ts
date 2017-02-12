@@ -1,13 +1,11 @@
-import { config } from '../configure';
 import applyPlugins from '../plugins';
 import generateCSSDeclaration from './generateCSSDeclaration';
 import renderCSSText from './renderCSSText';
 import generateClassName from './generateClassName';
-import {
-  Style,
-} from '../types';
+import { Style } from '../types';
 
 export default function renderStyle(
+  keys: string[],
   style: Style,
   classNames: string[],
   classNamesForModes: {[key: string]: string},
@@ -25,19 +23,27 @@ export default function renderStyle(
       declarations = [];
 
       if (isPseudo(property)) {
-        renderStyle(value as Style, classNames, classNamesForModes, pseudo + property, medias);
+        renderStyle(keys, value as Style, classNames, classNamesForModes, pseudo + property, medias);
 
       } else if (isMediaQuery(property)) {
         const media = property.slice(6).trim();
-        renderStyle(value as Style, classNames, classNamesForModes, pseudo, medias.concat(media));
+        renderStyle(keys, value as Style, classNames, classNamesForModes, pseudo, medias.concat(media));
 
       } else if (isMode(property)) {
         const mode = property.slice(1);
+        const newKeys = keys.concat(mode);
         let modeClassName = classNamesForModes[mode];
         if (!modeClassName) {
-          modeClassName = classNamesForModes[mode] = generateClassName();
+          modeClassName = classNamesForModes[mode] = generateClassName(newKeys);
         }
-        renderStyle(value as Style, classNames.concat(modeClassName), classNamesForModes, pseudo, medias);
+        renderStyle(
+          newKeys,
+          value as Style,
+          classNames.concat(modeClassName),
+          classNamesForModes,
+          pseudo,
+          medias,
+        );
 
       } else {
         throw new Error(`Invalid style for property ${property}: ${value}`);
@@ -57,9 +63,6 @@ function renderToNode(classNames: string[], pseudo: string, medias: string[], de
   const media = generateCombinedMediaQuery(medias);
   const cssRule = generateCSSRule(selector, declarations.join(';'), media);
 
-  if (!config.node.parentNode) {
-    document.head.appendChild(config.node);
-  }
   renderCSSText(cssRule);
 }
 

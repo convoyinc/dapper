@@ -5,8 +5,9 @@ let uniqueRuleIdentifier = 0;
 const CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const CHAR_LENGTH = CHARS.length;
 
-export default function generateClassName() {
-  return config.classNamePrefix + _generateClassName(++uniqueRuleIdentifier);
+export default function generateClassName(ids: string[]) {
+  const friendlyName = config.friendlyClassNames ? ids.map(id => `${id}-`).join('') : '';
+  return config.classNamePrefix + friendlyName + _generateClassName(++uniqueRuleIdentifier);
 }
 
 function _generateClassName(id: number, className = ''): string {

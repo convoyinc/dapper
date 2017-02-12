@@ -5,7 +5,7 @@ source ./scripts/include/node.sh
 
 OPTIONS=(
   --config ./webpack.config.ts
-  --port 3010
+  --port 3008
   --progress
   --quiet
 )

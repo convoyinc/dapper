@@ -12,13 +12,13 @@ import {
 export default function create<StyleSet extends Styles>(
   styles: StyleSet,
 ): CompiledStyleSheet<keyof StyleSet> {
-  return _.mapValues(styles, style => renderStyleToReducer(style)) as any;
+  return _.mapValues(styles, (style, key: string) => renderStyleToReducer(style, key)) as any;
 }
 
-function renderStyleToReducer(style: Style) {
-  const classNames = [generateClassName()];
+function renderStyleToReducer(style: Style, key: string) {
+  const classNames = [generateClassName([key])];
   const classNamesForModes = {};
-  renderStyle(style, classNames, classNamesForModes, '', []);
+  renderStyle([key], style, classNames, classNamesForModes, '', []);
   return getCompiledStyle(classNames, classNamesForModes);
 }
 

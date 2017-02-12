@@ -17,9 +17,7 @@ export type ModeState = { props: Props, state: State };
 
 // TODO
 // testing
-// HMR
 // reverse lookup of styles from className
-// friendly classNames
 
 const fadeOut = StyleSheet.keyframes({
   '0%': {
