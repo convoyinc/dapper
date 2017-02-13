@@ -18,7 +18,8 @@ export default function create<StyleSet extends Styles>(
 function renderStyleToReducer(style: Style, key: string) {
   const classNames = [generateClassName([key])];
   const classNamesForModes = {};
-  renderStyle([key], style, classNames, classNamesForModes, '', []);
+  const renderClassNames = classNames.map(cn => `.${cn}`);
+  renderStyle([key], style, renderClassNames, classNamesForModes);
   return getCompiledStyle(classNames, classNamesForModes);
 }
 

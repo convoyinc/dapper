@@ -16,7 +16,7 @@ export interface State {
 export type ModeState = { props: Props, state: State };
 
 // TODO
-// testing
+// testing (create, keyframes, renderStatic)
 // reverse lookup of styles from className
 
 const fadeOut = StyleSheet.keyframes({
@@ -42,6 +42,10 @@ const STYLES = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#BBB',
     padding: 8,
+    margin: {
+      $large: 10,
+      $ghost: 5,
+    },
     width: '200px',
     animation: `5s ${fadeOut} linear`,
     ':hover': {

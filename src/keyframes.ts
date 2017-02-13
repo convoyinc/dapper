@@ -28,7 +28,7 @@ function cssifyKeyframe(frames: KeyFrames, animationName: string) {
 }
 
 function generateAnimationName(id: number) {
-  return `${config.classNamePrefix}anim_${id}`;
+  return `${config.classNamePrefix}anim-${id}`;
 }
 
 function cssifyObject(style: Style) {
@@ -50,4 +50,8 @@ function cssifyObject(style: Style) {
   }
 
   return declarations.join(';');
+}
+
+export function resetUniqueId() {
+  uniqueKeyframeIdentifier = 0;
 }

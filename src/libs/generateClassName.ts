@@ -18,3 +18,7 @@ function _generateClassName(id: number, className = ''): string {
   // Bitwise floor as safari performs much faster https://jsperf.com/math-floor-vs-math-round-vs-parseint/55
   return _generateClassName(id / CHAR_LENGTH | 0, CHARS[id % CHAR_LENGTH] + className);
 }
+
+export function resetUniqueId() {
+  uniqueRuleIdentifier = 0;
+}
