@@ -15,10 +15,6 @@ export interface State {
 
 export type ModeState = { props: Props, state: State };
 
-// TODO
-// testing (create, keyframes, renderStatic)
-// reverse lookup of styles from className
-
 const fadeOut = StyleSheet.keyframes({
   '0%': {
     opacity: 0,
