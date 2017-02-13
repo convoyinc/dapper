@@ -15,7 +15,7 @@
 ```jsx
 import StyleSheet from '@convoy/dapper';
 
-const STYLES = StyleSheet.create({
+const STYLES = StyleSheet.createSimple({
   root: {
     display: 'flex',
     backgroundColor: '#BBB',
@@ -27,7 +27,7 @@ const STYLES = StyleSheet.create({
 export default class Button extends React.Component<Props, State> {
   render(): JSX.Element {
     return (
-      <div className={classnames(STYLES.root, this.props.className)} />
+      <div className={STYLES.root} />
     );
   }
 }

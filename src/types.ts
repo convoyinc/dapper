@@ -1,3 +1,7 @@
+export type CompiledSimpleStyleSheet<Keys extends string> = {
+  [Key in Keys]: string;
+};
+
 export type CompiledStyleSheet<Keys extends string> = {
   [Key in Keys]: CompiledStyle;
 };
