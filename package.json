@@ -16,6 +16,7 @@
     "start": "./scripts/start.sh",
     "test": "./scripts/test.sh",
     "test:build:webpack": "./scripts/test:build:webpack.sh",
+    "test:compile": "./scripts/test:compile.sh",
     "test:coverage": "./scripts/test:coverage.sh",
     "test:devserver": "./scripts/test:devserver.sh",
     "test:style": "./scripts/test:style.sh",
@@ -24,11 +25,8 @@
   "dependencies": {
     "hyphenate-style-name": "^1.0.2",
     "inline-style-prefixer": "^2.0.5",
+    "tslib": "1.4.0",
     "unitless-css-property": "^1.0.2"
-  },
-  "peerDependencies": {
-    "lodash": "^4.17.4",
-    "tslib": "^1.4.0"
   },
   "devDependencies": {
     "@types/chai": "3.4.34",
@@ -64,6 +62,10 @@
     "typescript": "2.1.5",
     "webpack": "2.2.0",
     "webpack-dev-server": "1.16.2"
+  },
+  "peerDependencies": {
+    "lodash": "^4.17.4",
+    "tslib": "^1.4.0"
   },
   "typings": "./src/index.ts"
 }

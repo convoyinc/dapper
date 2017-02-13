@@ -3,25 +3,6 @@
   "rules": {
     // TypeScript Specific
 
-    // We like to  keep things nice and orderly
-    "member-ordering": [true, {
-      "order": [
-        "public-static-field",
-        "public-static-method",
-        "protected-static-field",
-        "protected-static-method",
-        "private-static-field",
-        "private-static-method",
-        "public-instance-field",
-        "protected-instance-field",
-        "private-instance-field",
-        "constructor",
-        "public-instance-method",
-        "protected-instance-method",
-        "private-instance-method"
-      ]
-    }],
-
     // If the compiler is sure of the type of something, don't bother declaring
     // the type of it.
     "no-inferrable-types": true,
@@ -157,9 +138,6 @@
 
     // NO.
     "no-consecutive-blank-lines": [true, 1],
-
-    // If you want to use quotes, that's fine, but just make sure it's consistent.
-    "object-literal-key-quotes": [true, "as-needed"],
 
     // Prefer `{ foo }` instead of `{ foo: foo }`.
     "object-literal-shorthand": true,
