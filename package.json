@@ -25,7 +25,8 @@
   "dependencies": {
     "hyphenate-style-name": "^1.0.2",
     "inline-style-prefixer": "^2.0.5",
-    "tslib": "1.4.0",
+    "lodash": "^4.17.4",
+    "tslib": "^1.4.0",
     "unitless-css-property": "^1.0.2"
   },
   "devDependencies": {
@@ -62,10 +63,6 @@
     "typescript": "2.1.5",
     "webpack": "2.2.0",
     "webpack-dev-server": "1.16.2"
-  },
-  "peerDependencies": {
-    "lodash": "^4.17.4",
-    "tslib": "^1.4.0"
   },
   "typings": "./src/index.ts"
 }
