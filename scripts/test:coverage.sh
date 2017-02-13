@@ -13,6 +13,7 @@ source ./scripts/include/node.sh
 nyc \
   --require ts-node/register \
   --extension .ts \
+  --extension .tsx \
   --include src/ \
   --exclude dist/ \
   --exclude typings/ \
