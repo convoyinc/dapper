@@ -12,7 +12,7 @@
 
 ## Basic usage
 
-```
+```jsx
 import StyleSheet from '@convoy/dapper';
 
 const STYLES = StyleSheet.create({
@@ -35,7 +35,7 @@ export default class Button extends React.Component<Props, State> {
 
 ## Prop or state based styling
 
-```
+```jsx
 import StyleSheet from '@convoy/dapper';
 
 export interface Props {
@@ -139,7 +139,7 @@ export default class Button extends React.Component<Props, State> {
 
 ## keyframes
 
-```
+```jsx
 import StyleSheet from '@convoy/dapper';
 
 const fadeOut = StyleSheet.keyframes({
@@ -160,7 +160,7 @@ const STYLES = StyleSheet.create({
 
 ## renderStatic
 
-```
+```js
 StyleSheet.renderStatic({
   'html, body': {
     backgroundColor: '#CCFFFF',
@@ -173,7 +173,7 @@ StyleSheet.renderStatic({
 
 ## configure
 
-```
+```js
 StyleSheet.configure({
   node: document.querySelector('#stylesheet'),
   classNamePrefix: 'app-',
