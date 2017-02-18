@@ -52,12 +52,20 @@ describe(`create`, () => {
         padding: 4,
         flex:1,
         marginHorizontal: 5,
+        marginVertical: 5,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
       },
     });
     expect(className).to.deep.equal({root: 'dapper-root-a'});
     expect(renderCSSTextStub).to.have.been.calledWith(
-      `.dapper-root-a{-webkit-flex:1;-ms-flex:1;padding:4px;flex:1;` +
-      `margin-left:5px;margin-right:5px}`);
+      `.dapper-root-a{` +
+        `-webkit-flex:1;-ms-flex:1;padding:4px;flex:1;` +
+        `margin-left:5px;margin-right:5px;` +
+        `margin-top:5px;margin-bottom:5px;` +
+        `padding-left:5px;padding-right:5px;` +
+        `padding-top:5px;padding-bottom:5px` +
+      `}`);
   });
 
   it(`handles pseudo tags`, () => {
