@@ -2,6 +2,7 @@
   "compilerOptions": {
     "charset": "utf-8",
     "experimentalDecorators": true,
+    "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "jsx": "react",
