@@ -7,8 +7,6 @@ dependencies:
 
 test:
   override:
-    - npm run compile
-
     - npm run test:compile
 
     - npm run test:style:

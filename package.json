@@ -4,8 +4,7 @@
   "description": "Styling library",
   "license": "UNLICENSED",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "main": "./dist/src/index.js",
   "repository": "convoyinc/dapper",
@@ -67,5 +66,5 @@
     "lodash": "^4.17.4",
     "tslib": "^1.4.0"
   },
-  "typings": "./src/index.ts"
+  "typings": "./dist/src/index.d.ts"
 }
