@@ -24,7 +24,7 @@ function cssifyKeyframe(frames: KeyFrames, animationName: string) {
     .keys(frames)
     .reduce((css, percentage) => `${css + percentage}{${cssifyObject(frames[percentage])}}`, '');
 
-  return config.keyframePrefixes.reduce((css, prefix) => `${css}@${prefix}keyframes ${animationName}{${keyframe}}`, '');
+  return `@keyframes ${animationName}{${keyframe}}`;
 }
 
 function generateAnimationName(id: number) {

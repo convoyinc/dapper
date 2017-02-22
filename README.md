@@ -177,6 +177,5 @@ StyleSheet.renderStatic({
 StyleSheet.configure({
   node: document.querySelector('#stylesheet'),
   classNamePrefix: 'app-',
-  keyframePrefixes: ['-webkit-', '-moz-'],
   friendlyClassNames: false,
 })

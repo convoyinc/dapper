@@ -9,7 +9,8 @@ export default function renderCSSText(cssText: string) {
   }
 
   if (process.env.NODE_ENV === 'production') {
-    node.sheet.insertRule(cssText, node.sheet.cssRules.length);
+    const sheet = node.sheet as CSSStyleSheet;
+    sheet.insertRule(cssText, sheet.cssRules.length);
   } else {
     node.textContent += cssText + '\n';
   }

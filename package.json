@@ -4,8 +4,7 @@
   "description": "Styling library",
   "license": "UNLICENSED",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "main": "./dist/src/index.js",
   "repository": "convoyinc/dapper",
@@ -64,5 +63,5 @@
     "webpack": "2.2.0",
     "webpack-dev-server": "1.16.2"
   },
-  "typings": "./src/index.ts"
+  "typings": "./dist/src/index.d.ts"
 }
