@@ -14,7 +14,7 @@ export default function keyframes(keyframe: KeyFrames) {
 
   const cssText = cssifyKeyframe(keyframe, animationName);
 
-  renderCSSText(cssText);
+  renderCSSText([cssText]);
 
   return animationName;
 }
