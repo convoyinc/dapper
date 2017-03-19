@@ -46,7 +46,7 @@ function setClassNamesForStyles<T>(
     classNames[key] = getCompiledStyle(name, classNamesForModes);
   }
 
-  return { styles, classNames };
+  return { styles: newStyles, classNames };
 }
 
 function setClassNamesForStyle(
@@ -55,23 +55,23 @@ function setClassNamesForStyle(
   classNamesForModes: {[k: string]: string},
 ) {
   const newStyle: Style = {};
-  for (const key in style) {
+  for (let key in style) {
     const value = style[key];
-    let newKey = key;
+    let newKeys = keys;
     if (isPropertyMode(key)) {
       const mode = key.slice(1);
-      keys = keys.concat(mode);
+      newKeys = keys.concat(mode);
       let modeClassName = classNamesForModes[mode];
       if (!modeClassName) {
-        modeClassName = classNamesForModes[mode] = generateClassName(keys);
+        modeClassName = classNamesForModes[mode] = generateClassName(newKeys);
       }
-      newKey = `&.${modeClassName}`;
+      key = `&.${modeClassName}`;
     }
 
     if (value instanceof Object && !Array.isArray(value)) {
-      newStyle[newKey] = setClassNamesForStyle(keys, value as Style, classNamesForModes);
+      newStyle[key] = setClassNamesForStyle(newKeys, value as Style, classNamesForModes);
     } else {
-      newStyle[newKey] = value;
+      newStyle[key] = value;
     }
   }
 

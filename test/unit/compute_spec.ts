@@ -9,12 +9,8 @@ proxyquire.noCallThru();
 const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
 
-const renderStyle = proxyquire('../../src/libs/renderStyle', {
-  './renderCSSText': stub,
-});
-
 const {default: create } = proxyquire('../../src/create', {
-  './libs/renderStyle': renderStyle,
+  './libs/renderCSSText': stub,
 });
 
 describe(`compute`, () => {
@@ -45,9 +41,9 @@ describe(`compute`, () => {
       ghost: () => true,
     }, null);
     expect(styles['root']).to.equal('dapper-root-a dapper-root-ghost-b');
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith(
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
       '.dapper-root-a.dapper-root-ghost-b{color:red}',
-    );
+    ]);
   });
 
   it(`allows modes as children of property`, () => {
@@ -64,11 +60,9 @@ describe(`compute`, () => {
       blue: () => true,
     }, null);
     expect(styles['root']).to.equal('dapper-root-a dapper-root-blue-c');
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith(
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
       '.dapper-root-a.dapper-root-red-b{color:red}',
-    );
-    expect(renderCSSTextStub.getCall(1)).to.have.been.calledWith(
       '.dapper-root-a.dapper-root-blue-c{color:blue}',
-    );
+    ]);
   });
 });

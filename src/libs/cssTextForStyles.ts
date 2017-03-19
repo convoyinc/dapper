@@ -4,117 +4,131 @@ import applyPlugins from '../plugins';
 import generateCSSDeclaration from './generateCSSDeclaration';
 import { Style, Styles } from '../types';
 
-interface Selector {
-  selectors: string[];
-  pseudos: string[];
+interface ValueAndPath {
+  path: string[];
+  value: string|number;
 }
 
 // Given LESS-like styles { '.className': { '&.modeClassName': { fontSize: 5 }}}
 // Returns CSS text to render
 export default function cssTextForStyles(styles: Styles): string[] {
-  let cssTexts: string[] = [];
-  _.forEach(styles, (style, className: string) => {
+  const valueAndPaths: ValueAndPath[] = [];
+  _.forEach(styles, (style, key: string) => {
+    if (!(style instanceof Object)) {
+      throw new Error(`No CSS selector provided, just property ${key} with value ${JSON.stringify(style)}`);
+    }
     style = applyPlugins(style);
-    const selector = { selectors: [className], pseudos: [] };
-    cssTexts = cssTexts.concat(cssTextForStyle(style, [selector]));
+    valueAndPaths.push(...valueAndPathForStyle(style, [key]));
   });
-  return cssTexts;
+
+  return cssRuleForValueAndPaths(valueAndPaths);
 }
 
-function cssTextForStyle(
-  style: Style,
-  selectors: Selector[],
-  medias: string[] = [],
-  parentProperty: string|null = null,
-) {
-  const cssTexts: string[] = [];
-  let declarations: string[] = [];
-  let currentSelectors: Selector[] = [];
+// Gets a list of values and their key paths
+function valueAndPathForStyle(style: Style, keys: string[]) {
+  const valueAndPaths: ValueAndPath[] = [];
 
   for (const key in style) {
     const value = style[key];
 
-    // Duplicate selectors
-    currentSelectors = selectors.map(selector => ({
-      pseudos: selector.pseudos.slice(0),
-      selectors: selector.selectors.slice(0),
-    }));
-
-    const last = currentSelectors[selectors.length - 1];
-
-    const isPseudo = isPropertyPseudo(key);
-    const isMediaQuery = isPropertyMediaQuery(key);
-    const isParentSelector = isPropertyParentSelector(key);
-
-    if (isPseudo) {
-      last.pseudos.push(key);
-
-    } else if (isMediaQuery) {
-      medias = medias.concat(key.slice(6).trim());
-
-    } else if (isParentSelector) {
-      last.selectors.push(key.slice(1));
-    }
+    const path = keys.concat(key);
 
     if (value instanceof Object && !Array.isArray(value)) {
-      // Render all previous declarations as we will now be in a new selector
-      const cssText = cssTextForDeclarations(currentSelectors, medias, declarations);
-      cssTexts.push(cssText);
-      declarations = [];
-      const currentProperty = !isPseudo && !isMediaQuery && !isParentSelector
-        ? key
-        : parentProperty;
-
-      cssTextForStyle(value as Style, currentSelectors, medias, currentProperty);
+      valueAndPaths.push(...valueAndPathForStyle(value as Style, path));
 
     } else {
-      if (!parentProperty && (isPseudo || isMediaQuery || isParentSelector)) {
-        throw new Error(`No CSS property provided, just a selector ${key} for value ${JSON.stringify(value)}`);
-      }
-
-      // We can assert that if parentProperty then declarations.length === 0
-      // because all siblings must be pseudo, mode or mediaquery,
-      // which all reset declarations to []
-      let property = key;
-      if (parentProperty && (isPseudo || isParentSelector || isMediaQuery)) {
-        property = parentProperty;
-      }
-
       if (Array.isArray(value)) {
-        value.forEach(val => declarations.push(generateCSSDeclaration(property, val)));
+        value.forEach(val => valueAndPaths.push({path: path.slice(0), value: val}));
       } else {
-        declarations.push(generateCSSDeclaration(property, value));
-      }
-
-      // Since the value is under a new selector, render it
-      if (property === parentProperty) {
-        const cssText = cssTextForDeclarations(currentSelectors, medias, declarations);
-        cssTexts.push(cssText);
-        declarations = [];
+        valueAndPaths.push({path, value});
       }
     }
   }
-  const cssText = cssTextForDeclarations(currentSelectors, medias, declarations);
-  cssTexts.push(cssText);
+
+  return valueAndPaths;
+}
+
+function cssRuleForValueAndPaths(valueAndPaths: ValueAndPath[]) {
+  const selectorDeclarations = valueAndPaths.map(valueAndPath => {
+    const { path, value } = valueAndPath;
+    let property: string|null = null;
+    let selector = '';
+    let parentSelectors: string[] = [];
+    const medias: string[] = [];
+    let pseudos: string[] = [];
+
+    path.reverse().forEach(key => {
+      const isPseudo = isPropertyPseudo(key);
+      const isMediaQuery = isPropertyMediaQuery(key);
+      const isParentSelector = isPropertyParentSelector(key);
+
+      if (isParentSelector) {
+        parentSelectors.push(key.slice(1).trim());
+
+      } else if (isPseudo) {
+        pseudos.push(key);
+
+      } else if (isMediaQuery) {
+        medias.push(key.slice(6).trim());
+
+      } else if (property) {
+        selector = `${key}${parentSelectors.join('')}${pseudos.reverse().join('')} ` + selector;
+        parentSelectors = [];
+        pseudos = [];
+
+      } else {
+        property = key;
+
+      }
+    });
+
+    if (!property) {
+      throw new Error(`No CSS property provided, just selector ${selector} for value ${JSON.stringify(value)}`);
+    }
+
+    if (!selector) {
+      throw new Error(`No CSS selector provided, just property ${property} for value ${JSON.stringify(value)}`);
+    }
+
+    const declaration = generateCSSDeclaration(property, value);
+
+    return {
+      selector: selector.trim(),
+      declaration,
+      media: generateCombinedMediaQuery(medias.reverse()),
+    };
+  });
+
+  const cssTexts: string[] = [];
+  let lastSelector: string|null = null;
+  let lastMedia: string|null = null;
+  let declarations: string[] = [];
+  selectorDeclarations.forEach((selectorDeclaration, index) => {
+    const { selector, declaration, media } = selectorDeclaration;
+
+    if (lastSelector && (lastSelector !== selector || media !== lastMedia)) {
+      cssTexts.push(cssRuleForDeclarations(lastSelector, lastMedia, declarations));
+      declarations = [];
+    }
+
+    declarations.push(declaration);
+
+    if (index === selectorDeclarations.length - 1) {
+      cssTexts.push(cssRuleForDeclarations(selector, media, declarations));
+    }
+
+    lastMedia = media;
+    lastSelector = selector;
+  });
   return cssTexts;
 }
 
-function cssTextForDeclarations(selectors: Selector[], medias: string[], declarations: string[]) {
-  if (!declarations.length) return '';
-
-  let rule = selectors
-    .map(selector => (
-      selector.selectors.join('') + selector.pseudos.join('')
-    ))
-    .reverse()
-    .reduce((prev: string, selector: string) => `${selector}{${prev}}`, declarations.join(';'));
-
-  const media = generateCombinedMediaQuery(medias);
+function cssRuleForDeclarations(selector: string, media: string|null, declarations: string[]) {
+  let rule = `${selector}{${declarations.join(';')}}`;
 
   if (media) {
     rule = `${media}{${rule}}`;
   }
-
   return rule;
 }
 
@@ -136,62 +150,3 @@ function isPropertyMediaQuery(property: string) {
 function isPropertyParentSelector(property: string) {
   return property.charAt(0) === '&';
 }
-
-// const x: any = {
-//   '.blah': {
-//     ':hover': {
-//       '&.bar': {
-//         '.foo': {
-//           '&.dude': {
-//             x: 4,
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-
-// const y = [ { selectors: ['.blah', '.bar'], pseudos: [':hover'] }, { selectors: ['.foo', '.dude'] }]
-// const y = ['.blah:hover', '.foo.dude'];
-
-// const x: any = {
-//   'h1': {
-//     ':hover': {
-//       '&.bar': {
-//         x: 4,
-//       }
-//     }
-//   }
-// }
-
-// const x: any = {
-//   'h1, h2': {
-//     ':hover': {
-//       '&.bar': {
-//         x: 4,
-//       }
-//     }
-//   }
-// }
-
-// const x: any = {
-//   h1: {
-//     ':hover': {
-//       '&.bar': {
-//         padding: 4,
-//       }
-//     }
-//   },
-//   h2: {
-//    x: 5,
-//   }
-// }
-
-// { padding: { margin: 4 } } => padding { margin: 4px }
-// { h1: { padding: { '&.blah': 4 } } } => h1.blah { padding: 4px }
-// { h1: { padding: { '.blah': 4 } } } => h1 { padding: { .blah: 4px } }
-// { padding: 5 } => Error
-// { h1: { ':hover': { padding: 4 }, ':focus': { padding: 6 }}} => h1:hover { padding: 4px} h1:focus { padding: 6px }
-// { h1: { ':hover': { padding: 4 }, ':focus': { padding: 6 }}} => h1:hover { padding: 4px} h1:focus { padding: 6px }
-// { h1: { '&.blah': { paddingHorizontal: 4 } } } => h1.blah { paddingLeft: 4px; paddingRight: 4px; }
-// { h1: { '&.blah': { display: 'flex } } } => h1.blah { display: flex; -ms... }

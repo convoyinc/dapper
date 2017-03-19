@@ -8,12 +8,8 @@ proxyquire.noCallThru();
 const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
 
-const renderStyle = proxyquire('../../src/libs/renderStyle', {
-  './renderCSSText': stub,
-});
-
 const {default: create } = proxyquire('../../src/create', {
-  './libs/renderStyle': renderStyle,
+  './libs/renderCSSText': stub,
 });
 
 describe(`create`, () => {
@@ -42,8 +38,8 @@ describe(`create`, () => {
       },
     });
     expect(className).to.deep.equal({root: 'dapper-root-a'});
-    expect(renderCSSTextStub).to.have.been.calledWith(`.dapper-root-a{background-color:red;color:blue;padding:5px;` +
-      `display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex}`);
+    expect(renderCSSTextStub).to.have.been.calledWith([`.dapper-root-a{background-color:red;color:blue;padding:5px;` +
+      `display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex}`]);
   });
 
   it(`applies plugins`, () => {
@@ -58,14 +54,14 @@ describe(`create`, () => {
       },
     });
     expect(className).to.deep.equal({root: 'dapper-root-a'});
-    expect(renderCSSTextStub).to.have.been.calledWith(
+    expect(renderCSSTextStub).to.have.been.calledWith([
       `.dapper-root-a{` +
         `-webkit-flex:1;-ms-flex:1;padding:4px;flex:1;` +
         `margin-left:5px;margin-right:5px;` +
         `margin-top:5px;margin-bottom:5px;` +
         `padding-left:5px;padding-right:5px;` +
         `padding-top:5px;padding-bottom:5px` +
-      `}`);
+      `}`]);
   });
 
   it(`handles pseudo tags`, () => {
@@ -80,8 +76,10 @@ describe(`create`, () => {
       },
     });
     expect(className).to.deep.equal({root: 'dapper-root-a'});
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith('.dapper-root-a:hover{color:black}');
-    expect(renderCSSTextStub.getCall(1)).to.have.been.calledWith(`.dapper-root-a:hover::before{content:"a"}`);
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
+      '.dapper-root-a:hover{color:black}',
+      `.dapper-root-a:hover::before{content:"a"}`,
+    ]);
   });
 
   it(`handles media queries`, () => {
@@ -93,9 +91,9 @@ describe(`create`, () => {
       },
     });
     expect(className).to.deep.equal({root: 'dapper-root-a'});
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith(
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
       '@media screen and (min-width: 500px){.dapper-root-a{color:black}}',
-    );
+    ]);
   });
 
   it(`handles multiple media queries`, () => {
@@ -109,9 +107,9 @@ describe(`create`, () => {
       },
     });
     expect(className).to.deep.equal({root: 'dapper-root-a'});
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith(
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
       '@media screen and (min-width: 500px) and (max-width: 800px){.dapper-root-a{color:black}}',
-    );
+    ]);
   });
 
   it(`handles mode declarations`, () => {
@@ -123,9 +121,9 @@ describe(`create`, () => {
       },
     });
     expect(typeof className.root).to.equal('function');
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith(
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
       '.dapper-root-a.dapper-root-ghost-b{color:red}',
-    );
+    ]);
   });
 
   it(`handles deeply nested styling and renders in order`, () => {
@@ -142,30 +140,26 @@ describe(`create`, () => {
       },
     });
     expect(className).to.deep.equal({root: 'dapper-root-a'});
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith(
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
       '.dapper-root-a{color:blue}',
-    );
-    expect(renderCSSTextStub.getCall(1)).to.have.been.calledWith(
       '.dapper-root-a:hover{color:red}',
-    );
-    expect(renderCSSTextStub.getCall(2)).to.have.been.calledWith(
       '@media (min-width: 100px){.dapper-root-a:hover{color:green}}',
-    );
-    expect(renderCSSTextStub.getCall(3)).to.have.been.calledWith(
       '.dapper-root-a{background-color:red}',
-    );
+    ]);
   });
 
-  it(`throws on invalid object property`, () => {
-    expect(() => {
-      create({
-        root: {
-          color: {
-            background: 'red',
-          },
+  it(`allows ancestor selectors`, () => {
+    create({
+      root: {
+        color: {
+          background: 'red',
         },
-      });
-    }).to.throw(Error);
+      },
+    });
+
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
+      '.dapper-root-a color{background:red}',
+    ]);
   });
 
   it(`throws on invalid object property`, () => {
@@ -188,12 +182,10 @@ describe(`create`, () => {
       },
     });
     expect(typeof className.root).to.equal('function');
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith(
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
       '.dapper-root-a.dapper-root-red-b{color:red}',
-    );
-    expect(renderCSSTextStub.getCall(1)).to.have.been.calledWith(
       '.dapper-root-a.dapper-root-blue-c{color:blue}',
-    );
+    ]);
   });
 
   it(`handles an array of values`, () => {
@@ -203,8 +195,8 @@ describe(`create`, () => {
       },
     });
     expect(className).to.deep.equal({root: 'dapper-root-a'});
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith(
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
       '.dapper-root-a{color:blue;color:green}',
-    );
+    ]);
   });
 });
