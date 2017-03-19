@@ -38,8 +38,8 @@ describe(`keyframes`, () => {
       },
     });
     expect(fadeOut).to.equal('dapper-anim-1');
-    expect(renderCSSTextStub).to.have.been.calledWith(
+    expect(renderCSSTextStub).to.have.been.calledWith([
       '@keyframes dapper-anim-1{0%{opacity:0}100%{opacity:1}}',
-    );
+    ]);
   });
 });

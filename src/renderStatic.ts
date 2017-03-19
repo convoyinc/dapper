@@ -1,8 +1,8 @@
-import renderStyle from './libs/renderStyle';
+import cssTextForStyles from './libs/cssTextForStyles';
+import renderCSSText from './libs/renderCSSText';
 import { Styles } from './types';
 
 export default function renderStatic(styles: Styles) {
-  for (const selector in styles) {
-    renderStyle([selector], styles[selector], [selector], {});
-  }
+  const cssText = cssTextForStyles(styles);
+  renderCSSText(cssText);
 }

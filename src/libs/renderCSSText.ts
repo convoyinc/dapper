@@ -1,6 +1,6 @@
 import configure, { config } from '../configure';
 
-export default function renderCSSText(cssText: string) {
+export default function renderCSSText(cssTexts: string[]) {
   let node = config.node;
   if (!node) {
     node = document.createElement('style');
@@ -10,8 +10,10 @@ export default function renderCSSText(cssText: string) {
 
   if (process.env.NODE_ENV === 'production') {
     const sheet = node.sheet as CSSStyleSheet;
-    sheet.insertRule(cssText, sheet.cssRules.length);
+    cssTexts.forEach(cssText => {
+      sheet.insertRule(cssText, sheet.cssRules.length);
+    });
   } else {
-    node.textContent += cssText + '\n';
+    node.textContent += cssTexts.join('\n') + '\n';
   }
 }

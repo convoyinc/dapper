@@ -8,12 +8,8 @@ proxyquire.noCallThru();
 const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
 
-const renderStyle = proxyquire('../../src/libs/renderStyle', {
-  './renderCSSText': stub,
-});
-
 const {default: create } = proxyquire('../../src/create', {
-  './libs/renderStyle': renderStyle,
+  './libs/renderCSSText': stub,
 });
 
 describe(`configure`, () => {
@@ -38,6 +34,6 @@ describe(`configure`, () => {
       },
     });
     expect(className).to.deep.equal({root: 'dapper-a'});
-    expect(renderCSSTextStub).to.have.been.calledWith('.dapper-a{background-color:red;color:blue}');
+    expect(renderCSSTextStub).to.have.been.calledWith(['.dapper-a{background-color:red;color:blue}']);
   });
 });
