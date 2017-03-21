@@ -9,6 +9,8 @@
   ],
   "main": "./dist/src/index.js",
   "repository": "convoyinc/dapper",
+  "homepage": "https://github.com/convoyinc/dapper",
+  "bugs": "https://github.com/convoyinc/dapper/issues",
   "scripts": {
     "clean": "./scripts/clean.sh",
     "compile": "./scripts/compile.sh",
