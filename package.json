@@ -4,6 +4,7 @@
   "description": "Styling library",
   "license": "Apache-2.0",
   "files": [
+    "*.md",
     "dist"
   ],
   "main": "./dist/src/index.js",
