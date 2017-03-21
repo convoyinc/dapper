@@ -4,12 +4,6 @@
 
 `npm install @convoy/dapper`
 
-### Contributing
-
-1. Switch to the right node: `nvm install`
-2. Install the dependencies: `npm install`
-3. Watch for changes: `npm start`
-
 ## Basic usage
 
 ```jsx
@@ -179,3 +173,10 @@ StyleSheet.configure({
   classNamePrefix: 'app-',
   friendlyClassNames: false,
 })
+```
+
+## Contributing
+
+1. Switch to the right node: `nvm install`
+2. Install the dependencies: `npm install`
+3. Watch for changes: `npm start`
