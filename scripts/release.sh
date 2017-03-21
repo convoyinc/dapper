@@ -11,4 +11,4 @@ PACKAGE_VERSION="${PACKAGE_XY}.${CIRCLE_BUILD_NUM}"
 echo "Releasing ${PACKAGE_VERSION}"
 npm version "${PACKAGE_VERSION}"
 git push --tags
-npm publish --access public
+npm publish
