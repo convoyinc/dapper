@@ -2,7 +2,7 @@
   "name": "@convoy/dapper",
   "version": "1.0.0",
   "description": "Styling library",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "files": [
     "dist"
   ],
