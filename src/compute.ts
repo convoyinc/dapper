@@ -1,15 +1,16 @@
 import * as _ from 'lodash';
 import {
   CompiledStyle,
-  ModeDeclarations,
+  CompiledStyleSheet,
   ComputedStyleSheet,
+  ModeDeclarations,
 } from './types';
 
-export default function compute<Styles extends Object, State>(
-  compiledStyles: Styles,
+export default function compute<TKeys extends string, State>(
+  compiledStyles: CompiledStyleSheet<TKeys>,
   modeDeclarations: ModeDeclarations<State>,
   state: State,
-): ComputedStyleSheet<keyof Styles> {
+): ComputedStyleSheet<TKeys> {
   const modes = _.mapValues(modeDeclarations, resolver => resolver(state));
 
   return _.mapValues(compiledStyles, (style: CompiledStyle) => {
