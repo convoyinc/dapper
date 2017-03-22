@@ -22,10 +22,13 @@ export type StyleRule = {[key: string]: StyleValue|StyleValue[]|StyleRule};
 export type StyleDeclaration = {[key: string]: StyleRule};
 
 /**
- * A predicate function that returns whether a given mode (identified by `key`)
- * should be enabled given `state`.
+ * A map of predicate functions that declare the modes that should be made
+ * available to a dynamic stylesheet.
+ *
+ * Each predicate returns whether a given mode (identified by `key`) should be
+ * enabled given `state`.
  */
-export type ModeResolver<TState> = {[key: string]: (state: TState) => boolean};
+export type ModeDeclarations<TState> = {[key: string]: (state: TState) => boolean};
 
 // Intermediates
 
