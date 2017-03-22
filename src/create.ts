@@ -2,14 +2,14 @@ import generateClassName from './libs/generateClassName';
 import cssTextForStyles from './libs/cssTextForStyles';
 import renderCSSText from './libs/renderCSSText';
 import {
-  CompiledSimpleStyleSheet,
+  ActiveModes,
   CompiledStyleSheet,
-  ClassNameResolver,
-  Style,
-  Styles,
+  ComputedStyleSheet,
+  StyleDeclaration,
+  StyleRule,
 } from './types';
 
-export default function create<StyleSet extends Styles>(
+export default function create<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
 ): CompiledStyleSheet<keyof StyleSet> {
   const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles);
@@ -18,10 +18,10 @@ export default function create<StyleSet extends Styles>(
   return classNames;
 }
 
-export function createSimple<StyleSet extends Styles>(
+export function createSimple<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
-): CompiledSimpleStyleSheet<keyof StyleSet> {
-  const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledSimpleStyleSheet<keyof StyleSet>>(styles);
+): ComputedStyleSheet<keyof StyleSet> {
+  const {styles: newStyles, classNames} = setClassNamesForStyles<ComputedStyleSheet<keyof StyleSet>>(styles);
   const cssText = cssTextForStyles(newStyles);
   renderCSSText(cssText);
   return classNames;
@@ -30,9 +30,9 @@ export function createSimple<StyleSet extends Styles>(
 // Replaces top level keys with css className text '.keyClassName'
 // and replaces $modes with LESS style parent selector '&.modeClassName'
 function setClassNamesForStyles<T>(
-  styles: Styles,
-): {classNames: T, styles: Styles} {
-  const newStyles: Styles = {};
+  styles: StyleDeclaration,
+): {classNames: T, styles: StyleDeclaration} {
+  const newStyles: StyleDeclaration = {};
   const classNames: any = {};
 
   for (const key in styles) {
@@ -51,10 +51,10 @@ function setClassNamesForStyles<T>(
 
 function setClassNamesForStyle(
   keys: string[],
-  style: Style,
+  style: StyleRule,
   classNamesForModes: {[k: string]: string},
 ) {
-  const newStyle: Style = {};
+  const newStyle: StyleRule = {};
   for (let key in style) {
     const value = style[key];
     let newKeys = keys;
@@ -69,7 +69,7 @@ function setClassNamesForStyle(
     }
 
     if (value instanceof Object && !Array.isArray(value)) {
-      newStyle[key] = setClassNamesForStyle(newKeys, value as Style, classNamesForModes);
+      newStyle[key] = setClassNamesForStyle(newKeys, value as StyleRule, classNamesForModes);
     } else {
       newStyle[key] = value;
     }
@@ -86,7 +86,7 @@ function getCompiledStyle(className: string, classNamesForModes: {[key: string]:
   if (!Object.keys(classNamesForModes).length) {
     return className;
   } else {
-    return function styleReducer(modes: ClassNameResolver) {
+    return function styleReducer(modes: ActiveModes) {
       const names = [className];
       for (const mode in modes) {
         if (modes[mode]) {

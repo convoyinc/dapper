@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import applyPlugins from '../plugins';
 import generateCSSDeclaration from './generateCSSDeclaration';
-import { Style, Styles } from '../types';
+import { StyleRule, StyleDeclaration } from '../types';
 
 interface ValueAndPath {
   path: string[];
@@ -11,7 +11,7 @@ interface ValueAndPath {
 
 // Given LESS-like styles { '.className': { '&.modeClassName': { fontSize: 5 }}}
 // Returns CSS text to render
-export default function cssTextForStyles(styles: Styles): string[] {
+export default function cssTextForStyles(styles: StyleDeclaration): string[] {
   const valueAndPaths: ValueAndPath[] = [];
   _.forEach(styles, (style, key: string) => {
     if (!(style instanceof Object)) {
@@ -25,7 +25,7 @@ export default function cssTextForStyles(styles: Styles): string[] {
 }
 
 // Gets a list of values and their key paths
-function valueAndPathForStyle(style: Style, keys: string[]) {
+function valueAndPathForStyle(style: StyleRule, keys: string[]) {
   const valueAndPaths: ValueAndPath[] = [];
 
   for (const key in style) {
@@ -34,7 +34,7 @@ function valueAndPathForStyle(style: Style, keys: string[]) {
     const path = keys.concat(key);
 
     if (value instanceof Object && !Array.isArray(value)) {
-      valueAndPaths.push(...valueAndPathForStyle(value as Style, path));
+      valueAndPaths.push(...valueAndPathForStyle(value as StyleRule, path));
 
     } else {
       if (Array.isArray(value)) {

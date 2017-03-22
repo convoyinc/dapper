@@ -1,8 +1,8 @@
 import * as isUnitlessCSSProperty from 'unitless-css-property';
 
-import { Style } from '../types';
+import { StyleRule } from '../types';
 
-export default function addUnit(style: Style, unit = 'px') {
+export default function addUnit(style: StyleRule, unit = 'px') {
   for (const property in style) {
     if (isUnitlessCSSProperty(property)) continue;
 
@@ -10,7 +10,7 @@ export default function addUnit(style: Style, unit = 'px') {
     if (Array.isArray(cssValue)) {
       style[property] = cssValue.map(val => addUnitIfNeeded(val, unit));
     } else if (cssValue instanceof Object) {
-      style[property] = addUnit(cssValue as Style, unit);
+      style[property] = addUnit(cssValue as StyleRule, unit);
     } else {
       style[property] = addUnitIfNeeded(cssValue, unit);
     }

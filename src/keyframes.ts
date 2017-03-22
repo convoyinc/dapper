@@ -1,12 +1,12 @@
 import { config } from './configure';
-import { Style } from './types';
+import { StyleRule } from './types';
 import renderCSSText from './libs/renderCSSText';
 import generateCSSDeclaration from './libs/generateCSSDeclaration';
 import applyPlugins from './plugins';
 
 let uniqueKeyframeIdentifier = 0;
 
-export type KeyFrames = {[key: string]: Style};
+export type KeyFrames = {[key: string]: StyleRule};
 
 export default function keyframes(keyframe: KeyFrames) {
 
@@ -31,7 +31,7 @@ function generateAnimationName(id: number) {
   return `${config.classNamePrefix}anim-${id}`;
 }
 
-function cssifyObject(style: Style) {
+function cssifyObject(style: StyleRule) {
   style = applyPlugins(style);
 
   const declarations: string[] = [];

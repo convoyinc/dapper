@@ -3,9 +3,9 @@ import configure, { Configuration } from './configure';
 import create, { createSimple } from './create';
 import keyframes from './keyframes';
 import renderStatic from './renderStatic';
-import { Style } from './types';
+import { StyleRule } from './types';
 
-export { Style, Configuration };
+export { StyleRule, Configuration };
 export default {
   compute,
   configure,
