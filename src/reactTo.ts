@@ -18,6 +18,10 @@ export default function reactTo<TProps, TState, TRules extends string>(
   // it is named.
   const computed = compute(styles, modes, component);
 
+  // Note that we will hook a component each time `reactTo` is called on it,
+  // even if it's been hooked in the past.  This allows us to support multiple
+  // style objects per component; and avoids requring knowledge about which
+  // property needs updating (and how to reach it).
   _hook(component, 'componentWillUpdate', (base, props: TProps, state: TState, ...args: any[]) => {
     Object.assign(computed, compute(styles, modes, { props, state }));
     if (base) base(props, state, ...args);
