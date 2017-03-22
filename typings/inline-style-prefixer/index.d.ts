@@ -1,6 +1,5 @@
 declare module 'inline-style-prefixer/static' {
-  type Styles = {[key: string]: number | string | string[] | Styles};
   namespace prefix {}
-  function prefix(property: Styles): Styles;
+  function prefix(property: {[key: string]: any}): {[key: string]: any};
   export = prefix;
 }
