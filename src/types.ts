@@ -1,32 +1,4 @@
-/**
- * A map of rule names to their compiled rules.
- */
-export type CompiledStyleSheet<TKeys extends string> = {
-  [Key in TKeys]: CompiledStyle;
-};
-
-/**
- * A compiled style rule; may either be a static class name expression, or one
- * that requires dynamic computation based on active modes.
- */
-export type CompiledStyle = CSSClassName | StyleReducer;
-
-/**
- * A predicate function that returns whether a given mode (identified by `key`)
- * should be enabled given `state`.
- */
-export type ModeResolver<TState> = {[key: string]: (state: TState) => boolean};
-
-/**
- * A set of modes that are considered active, represented as an object so that
- * consumers don't have to polyfill Set.
- */
-export type ActiveModes = {[key: string]: boolean};
-
-/**
- * Evaluates which CSS classes should be enabled given the set of active modes.
- */
-export type StyleReducer = (modes: ActiveModes) => CSSClassName;
+// Inputs
 
 /**
  * Either a CSS value (as a string), or a numeric value that will be coerced
@@ -48,6 +20,40 @@ export type StyleRule = {[key: string]: StyleValue|StyleValue[]|StyleRule};
  * eventually flattened, and compiled down into actual CSS rules.
  */
 export type StyleDeclaration = {[key: string]: StyleRule};
+
+/**
+ * A predicate function that returns whether a given mode (identified by `key`)
+ * should be enabled given `state`.
+ */
+export type ModeResolver<TState> = {[key: string]: (state: TState) => boolean};
+
+// Intermediates
+
+/**
+ * Evaluates which CSS classes should be enabled given the set of active modes.
+ */
+export type StyleReducer = (modes: ActiveModes) => CSSClassName;
+
+/**
+ * A compiled style rule; may either be a static class name expression, or one
+ * that requires dynamic computation based on active modes.
+ */
+export type CompiledStyle = CSSClassName | StyleReducer;
+
+/**
+ * A map of rule names to their compiled rules.
+ */
+export type CompiledStyleSheet<TKeys extends string> = {
+  [Key in TKeys]: CompiledStyle;
+};
+
+/**
+ * A set of modes that are considered active, represented as an object so that
+ * consumers don't have to polyfill Set.
+ */
+export type ActiveModes = {[key: string]: boolean};
+
+// Outputs
 
 /**
  * A CSS class name express that is associated with a computed style rule.  May
