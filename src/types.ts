@@ -35,8 +35,16 @@ export type StyleRule = {[key: string]: StyleValue|StyleValue[]|StyleRule};
  */
 export type StyleDeclaration = {[key: string]: StyleRule};
 
-export type ComputedStyleSheet<Keys extends string> = {
-  [Key in Keys]: ComputedStyle;
-};
+/**
+ * A CSS class name that is associated with a computed style rule.
+ */
+export type CSSClassName = string;
 
-export type ComputedStyle = string;
+/**
+ * A map of rule names to the CSS class name that represents them.
+ *
+ * This is the result of computing a compiled style declaration.
+ */
+export type ComputedStyleSheet<Keys extends string> = {
+  [Key in Keys]: CSSClassName;
+};
