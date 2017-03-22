@@ -1,7 +1,3 @@
-export type CompiledSimpleStyleSheet<TKeys extends string> = {
-  [Key in TKeys]: string;
-};
-
 /**
  * A map of rule names to their compiled rules.
  */

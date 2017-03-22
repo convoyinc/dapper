@@ -2,11 +2,11 @@ import generateClassName from './libs/generateClassName';
 import cssTextForStyles from './libs/cssTextForStyles';
 import renderCSSText from './libs/renderCSSText';
 import {
-  CompiledSimpleStyleSheet,
-  CompiledStyleSheet,
   ActiveModes,
-  StyleRule,
+  CompiledStyleSheet,
+  ComputedStyleSheet,
   StyleDeclaration,
+  StyleRule,
 } from './types';
 
 export default function create<StyleSet extends StyleDeclaration>(
@@ -20,8 +20,8 @@ export default function create<StyleSet extends StyleDeclaration>(
 
 export function createSimple<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
-): CompiledSimpleStyleSheet<keyof StyleSet> {
-  const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledSimpleStyleSheet<keyof StyleSet>>(styles);
+): ComputedStyleSheet<keyof StyleSet> {
+  const {styles: newStyles, classNames} = setClassNamesForStyles<ComputedStyleSheet<keyof StyleSet>>(styles);
   const cssText = cssTextForStyles(newStyles);
   renderCSSText(cssText);
   return classNames;
