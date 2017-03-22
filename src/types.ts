@@ -16,7 +16,10 @@ export type ModeResolver<S> = {[key: string]: (state: S) => boolean};
  */
 export type ActiveModes = {[key: string]: boolean};
 
-export type StyleReducer = (modes: ActiveModes) => string;
+/**
+ * Evaluates which CSS classes should be enabled given the set of active modes.
+ */
+export type StyleReducer = (modes: ActiveModes) => CSSClassName;
 
 /**
  * Either a CSS value (as a string), or a numeric value that will be coerced
@@ -40,7 +43,8 @@ export type StyleRule = {[key: string]: StyleValue|StyleValue[]|StyleRule};
 export type StyleDeclaration = {[key: string]: StyleRule};
 
 /**
- * A CSS class name that is associated with a computed style rule.
+ * A CSS class name express that is associated with a computed style rule.  May
+ * be a combination of multiple CSS class names.
  */
 export type CSSClassName = string;
 
