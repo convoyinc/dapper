@@ -44,7 +44,6 @@
     "@types/sinon": "1.16.33",
     "@types/sinon-chai": "2.7.27",
     "@types/webpack": "2.2.4",
-    "apollo-client": "^0.7.3",
     "chai": "3.5.0",
     "classnames": "^2.2.5",
     "codecov": "1.0.1",
