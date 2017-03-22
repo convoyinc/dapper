@@ -4,7 +4,7 @@ import renderCSSText from './libs/renderCSSText';
 import {
   CompiledSimpleStyleSheet,
   CompiledStyleSheet,
-  ClassNameResolver,
+  ActiveModes,
   StyleRule,
   StyleDeclaration,
 } from './types';
@@ -86,7 +86,7 @@ function getCompiledStyle(className: string, classNamesForModes: {[key: string]:
   if (!Object.keys(classNamesForModes).length) {
     return className;
   } else {
-    return function styleReducer(modes: ClassNameResolver) {
+    return function styleReducer(modes: ActiveModes) {
       const names = [className];
       for (const mode in modes) {
         if (modes[mode]) {

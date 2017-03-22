@@ -10,9 +10,13 @@ export type CompiledStyle = string | StyleReducer;
 
 export type ModeResolver<S> = {[key: string]: (state: S) => boolean};
 
-export type ClassNameResolver = {[key: string]: boolean};
+/**
+ * A set of modes that are considered active, represented as an object so that
+ * consumers don't have to polyfill Set.
+ */
+export type ActiveModes = {[key: string]: boolean};
 
-export type StyleReducer = (modes: ClassNameResolver) => string;
+export type StyleReducer = (modes: ActiveModes) => string;
 
 /**
  * Either a CSS value (as a string), or a numeric value that will be coerced
