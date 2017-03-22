@@ -14,9 +14,9 @@ export type ClassNameResolver = {[key: string]: boolean};
 
 export type StyleReducer = (modes: ClassNameResolver) => string;
 
-export type Style = {[key: string]: number|string|string[]|Style};
+export type StyleRule = {[key: string]: number|string|string[]|StyleRule};
 
-export type Styles = {[key: string]: Style};
+export type Styles = {[key: string]: StyleRule};
 
 export type ComputedStyleSheet<Keys extends string> = {
   [Key in Keys]: ComputedStyle;

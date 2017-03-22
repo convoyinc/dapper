@@ -1,7 +1,7 @@
 import * as prefix from 'inline-style-prefixer/static';
 
-import { Style } from '../types';
+import { StyleRule } from '../types';
 
-export default function prefixer(style: Style): Style {
+export default function prefixer(style: StyleRule): StyleRule {
   return prefix(style);
 }

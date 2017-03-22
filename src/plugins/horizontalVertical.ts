@@ -1,6 +1,6 @@
-import { Style } from '../types';
+import { StyleRule } from '../types';
 
-export default function horizontalVertical(style: Style) {
+export default function horizontalVertical(style: StyleRule) {
   for (const property in style) {
     if (property === 'paddingHorizontal') {
       style['paddingLeft'] = style[property];

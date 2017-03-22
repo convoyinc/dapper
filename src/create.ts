@@ -5,7 +5,7 @@ import {
   CompiledSimpleStyleSheet,
   CompiledStyleSheet,
   ClassNameResolver,
-  Style,
+  StyleRule,
   Styles,
 } from './types';
 
@@ -51,10 +51,10 @@ function setClassNamesForStyles<T>(
 
 function setClassNamesForStyle(
   keys: string[],
-  style: Style,
+  style: StyleRule,
   classNamesForModes: {[k: string]: string},
 ) {
-  const newStyle: Style = {};
+  const newStyle: StyleRule = {};
   for (let key in style) {
     const value = style[key];
     let newKeys = keys;
@@ -69,7 +69,7 @@ function setClassNamesForStyle(
     }
 
     if (value instanceof Object && !Array.isArray(value)) {
-      newStyle[key] = setClassNamesForStyle(newKeys, value as Style, classNamesForModes);
+      newStyle[key] = setClassNamesForStyle(newKeys, value as StyleRule, classNamesForModes);
     } else {
       newStyle[key] = value;
     }
