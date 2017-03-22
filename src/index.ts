@@ -9,6 +9,7 @@ import { StyleRule } from './types';
 export {
   Configuration,
   StyleRule,
+  create as compile, // https://github.com/convoyinc/dapper/issues/13
   reactTo,
 };
 export default {

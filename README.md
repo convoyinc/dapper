@@ -4,6 +4,84 @@
 
 `npm install @convoy/dapper`
 
+## React usage
+
+### Static Styles
+
+```tsx
+import * as dapper from '@convoy/dapper';
+
+const STYLES = dapper.compile({
+  root: {
+    backgroundColor: '#eee',
+  },
+});
+
+export default class Button extends React.Component<Props, State> {
+  styles = dapper.reactTo(this, STYLES);
+
+  render() {
+    return (
+      <div className={this.styles.root} />
+    );
+  }
+}
+```
+
+### Dynamic Styles
+
+```tsx
+import * as dapper from '@convoy/dapper';
+
+interface State {
+  hovered: boolean;
+}
+
+const STYLES = dapper.compile({
+  root: {
+    backgroundColor: '#eee',
+    '$hover': {
+      backgroundColor: '#fff',
+    },
+  },
+  label: {
+    '$hover': {
+      color: '#999',
+    },
+  },
+});
+
+const MODES = {
+  hovered: ({ state }: { state: State }) => state.hovered,
+};
+
+export default class Button extends React.Component<Props, State> {
+  state = { hovered: false };
+  styles = dapper.reactTo(this, STYLES, MODES);
+
+  render() {
+    return (
+      <div
+        className={this.styles.root}
+        onMouseEnter={this._onMouseEnter}
+        onMouseLeave={this._onMouseLeave}
+      >
+        <div className={this.styles.label}>BUTTEN</div>
+      </div>
+    );
+  }
+
+  _onMouseEnter = () => {
+    this.setState({ hovered: true });
+  }
+
+  _onMouseLeave = () => {
+    this.setState({ hovered: false });
+  }
+}
+```
+
+
 ## Basic usage
 
 ```jsx
@@ -19,7 +97,7 @@ const STYLES = StyleSheet.createSimple({
 });
 
 export default class Button extends React.Component<Props, State> {
-  render(): JSX.Element {
+  render() {
     return (
       <div className={STYLES.root} />
     );
@@ -101,7 +179,7 @@ export default class Button extends React.Component<Props, State> {
     this.styles = StyleSheet.compute(STYLES, MODES, { props, state });
   }
 
-  render(): JSX.Element {
+  render() {
     return (
       <div
         className={classnames(this.styles.root, this.props.className)}
