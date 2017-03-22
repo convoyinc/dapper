@@ -16,8 +16,10 @@ export type StyleReducer = (modes: ClassNameResolver) => string;
 
 /**
  * Either a CSS value (as a string), or a numeric value that will be coerced
- * into a context-appropriate value.  Typically, this means we append a CSS unit
- * of 'px' to the number.
+ * into a context-appropriate value.
+ *
+ * Typically, this means we append a CSS unit of 'px' to the number.  Some
+ * properties (such as `lineHeight`) can be unitless, and will not gain a unit.
  */
 export type StyleValue = number|string;
 
