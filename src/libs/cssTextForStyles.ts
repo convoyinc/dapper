@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import applyPlugins from '../plugins';
 import generateCSSDeclaration from './generateCSSDeclaration';
-import { StyleRule, Styles } from '../types';
+import { StyleRule, StyleDeclaration } from '../types';
 
 interface ValueAndPath {
   path: string[];
@@ -11,7 +11,7 @@ interface ValueAndPath {
 
 // Given LESS-like styles { '.className': { '&.modeClassName': { fontSize: 5 }}}
 // Returns CSS text to render
-export default function cssTextForStyles(styles: Styles): string[] {
+export default function cssTextForStyles(styles: StyleDeclaration): string[] {
   const valueAndPaths: ValueAndPath[] = [];
   _.forEach(styles, (style, key: string) => {
     if (!(style instanceof Object)) {

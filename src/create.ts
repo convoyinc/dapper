@@ -6,10 +6,10 @@ import {
   CompiledStyleSheet,
   ClassNameResolver,
   StyleRule,
-  Styles,
+  StyleDeclaration,
 } from './types';
 
-export default function create<StyleSet extends Styles>(
+export default function create<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
 ): CompiledStyleSheet<keyof StyleSet> {
   const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles);
@@ -18,7 +18,7 @@ export default function create<StyleSet extends Styles>(
   return classNames;
 }
 
-export function createSimple<StyleSet extends Styles>(
+export function createSimple<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
 ): CompiledSimpleStyleSheet<keyof StyleSet> {
   const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledSimpleStyleSheet<keyof StyleSet>>(styles);
@@ -30,9 +30,9 @@ export function createSimple<StyleSet extends Styles>(
 // Replaces top level keys with css className text '.keyClassName'
 // and replaces $modes with LESS style parent selector '&.modeClassName'
 function setClassNamesForStyles<T>(
-  styles: Styles,
-): {classNames: T, styles: Styles} {
-  const newStyles: Styles = {};
+  styles: StyleDeclaration,
+): {classNames: T, styles: StyleDeclaration} {
+  const newStyles: StyleDeclaration = {};
   const classNames: any = {};
 
   for (const key in styles) {
