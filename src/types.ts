@@ -6,7 +6,11 @@ export type CompiledStyleSheet<TKeys extends string> = {
   [Key in TKeys]: CompiledStyle;
 };
 
-export type CompiledStyle = string | StyleReducer;
+/**
+ * A compiled style rule; may either be a static class name expression, or one
+ * that requires dynamic computation based on active modes.
+ */
+export type CompiledStyle = CSSClassName | StyleReducer;
 
 /**
  * A predicate function that returns whether a given mode (identified by `key`)
