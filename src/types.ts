@@ -8,7 +8,11 @@ export type CompiledStyleSheet<Keys extends string> = {
 
 export type CompiledStyle = string | StyleReducer;
 
-export type ModeResolver<S> = {[key: string]: (state: S) => boolean};
+/**
+ * A predicate function that returns whether a given mode (identified by `key`)
+ * should be enabled given `state`.
+ */
+export type ModeResolver<TState> = {[key: string]: (state: TState) => boolean};
 
 /**
  * A set of modes that are considered active, represented as an object so that
