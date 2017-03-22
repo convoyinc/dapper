@@ -1,9 +1,9 @@
-export type CompiledSimpleStyleSheet<Keys extends string> = {
-  [Key in Keys]: string;
+export type CompiledSimpleStyleSheet<TKeys extends string> = {
+  [Key in TKeys]: string;
 };
 
-export type CompiledStyleSheet<Keys extends string> = {
-  [Key in Keys]: CompiledStyle;
+export type CompiledStyleSheet<TKeys extends string> = {
+  [Key in TKeys]: CompiledStyle;
 };
 
 export type CompiledStyle = string | StyleReducer;
