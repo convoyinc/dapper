@@ -67,7 +67,7 @@ const STYLES = dapper.create({
       fontSize: '20px',
     },
     $hovered: {
-      borderRight: '1px solid #000',
+      color: 'white',
     },
   },
   text: {
@@ -86,11 +86,7 @@ export default class Button extends React.Component<Props, State> {
     hovered: false,
   };
 
-  styles = dapper.compute(STYLES, MODES, { props: this.props, state: this.state });
-
-  componentWillUpdate(props: Props, state: State) {
-    this.styles = dapper.compute(STYLES, MODES, { props, state });
-  }
+  styles = dapper.reactTo(this, STYLES, MODES);
 
   render(): JSX.Element {
     return (

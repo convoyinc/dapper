@@ -1,3 +1,4 @@
+import reactTo from './reactTo';
 import compute from './compute';
 import configure, { Configuration } from './configure';
 import create, { createSimple } from './create';
@@ -6,12 +7,13 @@ import renderStatic from './renderStatic';
 import { StyleRule } from './types';
 
 export {
-  StyleRule,
   Configuration,
+  StyleRule,
   compute,
   configure,
   create,
   createSimple,
   keyframes,
+  reactTo,
   renderStatic,
 };
