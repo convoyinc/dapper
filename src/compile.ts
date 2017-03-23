@@ -9,7 +9,7 @@ import {
   StyleRule,
 } from './types';
 
-export default function create<StyleSet extends StyleDeclaration>(
+export default function compile<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
 ): CompiledStyleSheet<keyof StyleSet> {
   const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles);

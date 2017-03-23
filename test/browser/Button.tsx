@@ -33,7 +33,7 @@ dapper.renderStatic({
   },
 });
 
-const STYLES = dapper.create({
+const STYLES = dapper.compile({
   root: {
     display: 'flex',
     backgroundColor: '#BBB',

@@ -1,6 +1,6 @@
 import compute from './compute';
 import configure, { Configuration } from './configure';
-import create, { createSimple } from './create';
+import compile, { createSimple } from './compile';
 import keyframes from './keyframes';
 import renderStatic from './renderStatic';
 import { StyleRule } from './types';
@@ -10,7 +10,7 @@ export {
   Configuration,
   compute,
   configure,
-  create,
+  compile,
   createSimple,
   keyframes,
   renderStatic,
