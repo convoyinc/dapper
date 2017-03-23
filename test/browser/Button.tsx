@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
 
-import StyleSheet from '../../src';
+import StyleSheet, { reactTo } from '../../src';
 
 export interface Props {
   large?: boolean;
@@ -67,7 +67,7 @@ const STYLES = StyleSheet.create({
       fontSize: '20px',
     },
     $hovered: {
-      borderRight: '1px solid #000',
+      color: 'white',
     },
   },
   text: {
@@ -86,11 +86,7 @@ export default class Button extends React.Component<Props, State> {
     hovered: false,
   };
 
-  styles = StyleSheet.compute(STYLES, MODES, { props: this.props, state: this.state });
-
-  componentWillUpdate(props: Props, state: State) {
-    this.styles = StyleSheet.compute(STYLES, MODES, { props, state });
-  }
+  styles = reactTo(this, STYLES, MODES);
 
   render(): JSX.Element {
     return (
