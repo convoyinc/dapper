@@ -5,8 +5,9 @@ import keyframes from './keyframes';
 import renderStatic from './renderStatic';
 import { StyleRule } from './types';
 
-export { StyleRule, Configuration };
-export default {
+export {
+  StyleRule,
+  Configuration,
   compute,
   configure,
   create,

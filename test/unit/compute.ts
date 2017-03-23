@@ -2,7 +2,7 @@ import * as sinon from 'sinon';
 import * as proxyquire from 'proxyquire';
 import configure from '../../src/configure';
 import { resetUniqueId } from '../../src/libs/generateClassName';
-import StyleSheet from '../../src';
+import * as dapper from '../../src';
 
 proxyquire.noCallThru();
 
@@ -37,7 +37,7 @@ describe(`compute`, () => {
         },
       },
     });
-    const styles = StyleSheet.compute(className, {
+    const styles = dapper.compute(className, {
       ghost: () => true,
     }, null);
     expect(styles['root']).to.equal('dapper-root-a dapper-root-ghost-b');
@@ -55,7 +55,7 @@ describe(`compute`, () => {
         },
       },
     });
-    const styles = StyleSheet.compute(className, {
+    const styles = dapper.compute(className, {
       red: () => false,
       blue: () => true,
     }, null);
