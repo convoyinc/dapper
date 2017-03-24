@@ -8,7 +8,7 @@ export default function renderCSSText(cssTexts: string[]) {
     document.head.appendChild(node);
   }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (config.useInsertRule) {
     const sheet = node.sheet as CSSStyleSheet;
     cssTexts.forEach(cssText => {
       sheet.insertRule(cssText, sheet.cssRules.length);
