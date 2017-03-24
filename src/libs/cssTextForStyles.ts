@@ -14,7 +14,7 @@ interface ValueAndPath {
 export default function cssTextForStyles(styles: StyleDeclaration): string[] {
   const valueAndPaths: ValueAndPath[] = [];
   _.forEach(styles, (style, key: string) => {
-    if (!(style instanceof Object)) {
+    if (typeof style !== 'object') {
       throw new Error(`No CSS selector provided, just property ${key} with value ${JSON.stringify(style)}`);
     }
     style = applyPlugins(style);
@@ -33,7 +33,7 @@ function valueAndPathForStyle(style: StyleRule, keys: string[]) {
 
     const path = keys.concat(key);
 
-    if (value instanceof Object && !Array.isArray(value)) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
       valueAndPaths.push(...valueAndPathForStyle(value as StyleRule, path));
 
     } else {
