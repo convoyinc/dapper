@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
 
-import StyleSheet, { reactTo } from '../../src';
+import * as dapper from '../../src';
 
 export interface Props {
   large?: boolean;
@@ -15,7 +15,7 @@ export interface State {
 
 export type ModeState = { props: Props, state: State };
 
-const fadeOut = StyleSheet.keyframes({
+const fadeOut = dapper.keyframes({
   '0%': {
     opacity: 0,
   },
@@ -24,7 +24,7 @@ const fadeOut = StyleSheet.keyframes({
   },
 });
 
-StyleSheet.renderStatic({
+dapper.renderStatic({
   'html, body': {
     backgroundColor: '#CCFFFF',
     '@media (max-width: 800px)': {
@@ -33,7 +33,7 @@ StyleSheet.renderStatic({
   },
 });
 
-const STYLES = StyleSheet.create({
+const STYLES = dapper.compile({
   root: {
     display: 'flex',
     backgroundColor: '#BBB',
@@ -86,7 +86,7 @@ export default class Button extends React.Component<Props, State> {
     hovered: false,
   };
 
-  styles = reactTo(this, STYLES, MODES);
+  styles = dapper.reactTo(this, STYLES, MODES);
 
   render(): JSX.Element {
     return (

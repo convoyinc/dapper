@@ -8,7 +8,7 @@ proxyquire.noCallThru();
 const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
 
-const {default: create } = proxyquire('../../src/create', {
+const {default: compile } = proxyquire('../../src/compile', {
   './libs/renderCSSText': stub,
 });
 
@@ -27,7 +27,7 @@ describe(`configure`, () => {
   it(`friendlyClassNames set to false doesn't add name`, () => {
     configure({ friendlyClassNames: false });
 
-    const className = create({
+    const className = compile({
       root: {
         backgroundColor: 'red',
         color: 'blue',

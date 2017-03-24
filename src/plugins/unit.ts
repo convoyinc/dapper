@@ -9,7 +9,7 @@ export default function addUnit(style: StyleRule, unit = 'px') {
     const cssValue = style[property];
     if (Array.isArray(cssValue)) {
       style[property] = cssValue.map(val => addUnitIfNeeded(val, unit));
-    } else if (cssValue instanceof Object) {
+    } else if (typeof cssValue === 'object') {
       style[property] = addUnit(cssValue as StyleRule, unit);
     } else {
       style[property] = addUnitIfNeeded(cssValue, unit);

@@ -1,13 +1,12 @@
 import * as React from 'react';
 
 import * as dapper from '../../src';
-import StyleSheet from '../../src';
 
 export interface BaseState {
   hovered: boolean;
 }
 
-const BASE_STYLES = StyleSheet.create({
+const BASE_STYLES = dapper.compile({
   root: {
     display: 'inline-block',
     margin: 10,
@@ -65,7 +64,7 @@ export class BaseComponent extends React.Component<any, BaseState> {
 
 }
 
-const STYLES = StyleSheet.create({
+const STYLES = dapper.compile({
   content: {
     '$hovered': {
       fontWeight: '900',

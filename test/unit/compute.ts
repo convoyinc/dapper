@@ -2,14 +2,14 @@ import * as sinon from 'sinon';
 import * as proxyquire from 'proxyquire';
 import configure from '../../src/configure';
 import { resetUniqueId } from '../../src/libs/generateClassName';
-import StyleSheet from '../../src';
+import * as dapper from '../../src';
 
 proxyquire.noCallThru();
 
 const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
 
-const {default: create } = proxyquire('../../src/create', {
+const {default: compile } = proxyquire('../../src/compile', {
   './libs/renderCSSText': stub,
 });
 
@@ -30,14 +30,14 @@ describe(`compute`, () => {
   });
 
   it(`handles mode declarations`, () => {
-    const className = create({
+    const className = compile({
       root: {
         $ghost: {
           color: 'red',
         },
       },
     });
-    const styles = StyleSheet.compute(className, {
+    const styles = dapper.compute(className, {
       ghost: () => true,
     }, null);
     expect(styles['root']).to.equal('dapper-root-a dapper-root-ghost-b');
@@ -47,7 +47,7 @@ describe(`compute`, () => {
   });
 
   it(`allows modes as children of property`, () => {
-    const className = create({
+    const className = compile({
       root: {
         color: {
           $red: 'red',
@@ -55,7 +55,7 @@ describe(`compute`, () => {
         },
       },
     });
-    const styles = StyleSheet.compute(className, {
+    const styles = dapper.compute(className, {
       red: () => false,
       blue: () => true,
     }, null);

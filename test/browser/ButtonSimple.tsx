@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import StyleSheet from '../../src';
+import * as dapper from '../../src';
 
-const STYLES = StyleSheet.createSimple({
+const STYLES = dapper.createSimple({
   root: {
     display: 'inline-flex',
     backgroundColor: '#BBB',

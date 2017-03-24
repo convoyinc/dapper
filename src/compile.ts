@@ -9,7 +9,7 @@ import {
   StyleRule,
 } from './types';
 
-export default function create<StyleSet extends StyleDeclaration>(
+export default function compile<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
 ): CompiledStyleSheet<keyof StyleSet> {
   const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles);
@@ -68,7 +68,7 @@ function setClassNamesForStyle(
       key = `&.${modeClassName}`;
     }
 
-    if (value instanceof Object && !Array.isArray(value)) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
       newStyle[key] = setClassNamesForStyle(newKeys, value as StyleRule, classNamesForModes);
     } else {
       newStyle[key] = value;

@@ -8,11 +8,11 @@ proxyquire.noCallThru();
 const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
 
-const {default: create } = proxyquire('../../src/create', {
+const {default: compile } = proxyquire('../../src/compile', {
   './libs/renderCSSText': stub,
 });
 
-describe(`create`, () => {
+describe(`compile`, () => {
   let renderCSSTextStub: sinon.SinonStub;
 
   before(() => {
@@ -29,7 +29,7 @@ describe(`create`, () => {
   });
 
   it(`calls renderCSSText with basic cssText`, () => {
-    const className = create({
+    const className = compile({
       root: {
         backgroundColor: 'red',
         color: 'blue',
@@ -43,7 +43,7 @@ describe(`create`, () => {
   });
 
   it(`applies plugins`, () => {
-    const className = create({
+    const className = compile({
       root: {
         padding: 4,
         flex:1,
@@ -64,8 +64,27 @@ describe(`create`, () => {
       `}`]);
   });
 
+  it(`applies plugins deeply`, () => {
+    const className = compile({
+      root: {
+        blah: {
+          flex:1,
+          margin: 5,
+          paddingHorizontal: 4,
+        },
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub).to.have.been.calledWith([
+      `.dapper-root-a blah{` +
+        `-webkit-flex:1;-ms-flex:1;flex:1;` +
+        `margin:5px;` +
+        `padding-left:4px;padding-right:4px` +
+      `}`]);
+  });
+
   it(`handles pseudo tags`, () => {
-    const className = create({
+    const className = compile({
       root: {
         ':hover': {
           color: 'black',
@@ -83,7 +102,7 @@ describe(`create`, () => {
   });
 
   it(`handles media queries`, () => {
-    const className = create({
+    const className = compile({
       root: {
         '@media screen and (min-width: 500px)': {
           color: 'black',
@@ -97,7 +116,7 @@ describe(`create`, () => {
   });
 
   it(`handles multiple media queries`, () => {
-    const className = create({
+    const className = compile({
       root: {
         '@media screen and (min-width: 500px)': {
           '@media (max-width: 800px)': {
@@ -113,7 +132,7 @@ describe(`create`, () => {
   });
 
   it(`handles mode declarations`, () => {
-    const className = create({
+    const className = compile({
       root: {
         $ghost: {
           color: 'red',
@@ -127,7 +146,7 @@ describe(`create`, () => {
   });
 
   it(`handles deeply nested styling and renders in order`, () => {
-    const className = create({
+    const className = compile({
       root: {
         color:'blue',
         ':hover': {
@@ -149,7 +168,7 @@ describe(`create`, () => {
   });
 
   it(`allows ancestor selectors`, () => {
-    create({
+    compile({
       root: {
         color: {
           background: 'red',
@@ -164,7 +183,7 @@ describe(`create`, () => {
 
   it(`throws on invalid object property`, () => {
     expect(() => {
-      create({
+      compile({
         root: {
           $mode: 'red',
         },
@@ -173,7 +192,7 @@ describe(`create`, () => {
   });
 
   it(`allows modes as children of property`, () => {
-    const className = create({
+    const className = compile({
       root: {
         color: {
           $red: 'red',
@@ -189,7 +208,7 @@ describe(`create`, () => {
   });
 
   it(`handles an array of values`, () => {
-    const className = create({
+    const className = compile({
       root: {
         color:['blue', 'green'],
       },
