@@ -1,6 +1,6 @@
-import configure, { config } from '../configure';
+import configure, { Configuration } from '../configure';
 
-export default function renderCSSText(cssTexts: string[]) {
+export default function renderCSSText(cssTexts: string[], config: Configuration) {
   let node = config.node;
   if (!node) {
     node = document.createElement('style');

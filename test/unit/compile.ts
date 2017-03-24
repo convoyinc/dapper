@@ -42,6 +42,20 @@ describe(`compile`, () => {
       `display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex}`]);
   });
 
+  it(`uses custom configuration`, () => {
+    const className = compile({
+      root: {
+        backgroundColor: 'red',
+        color: 'blue',
+        padding: 5,
+        display:'flex',
+      },
+    }, { classNamePrefix: 'dap-' });
+    expect(className).to.deep.equal({root: 'dap-root-a'});
+    expect(renderCSSTextStub).to.have.been.calledWith([`.dap-root-a{background-color:red;color:blue;padding:5px;` +
+      `display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex}`]);
+  });
+
   it(`applies plugins`, () => {
     const className = compile({
       root: {

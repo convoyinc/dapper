@@ -1,4 +1,4 @@
-import { config } from './configure';
+import { config as defaultConfig, Configuration } from './configure';
 import { StyleRule } from './types';
 import renderCSSText from './libs/renderCSSText';
 import generateCSSDeclaration from './libs/generateCSSDeclaration';
@@ -8,13 +8,13 @@ let uniqueKeyframeIdentifier = 0;
 
 export type KeyFrames = {[key: string]: StyleRule};
 
-export default function keyframes(keyframe: KeyFrames) {
-
-  const animationName = generateAnimationName(++uniqueKeyframeIdentifier);
+export default function keyframes(keyframe: KeyFrames, config = defaultConfig) {
+  config = { ...defaultConfig, ...config };
+  const animationName = generateAnimationName(++uniqueKeyframeIdentifier, config);
 
   const cssText = cssifyKeyframe(keyframe, animationName);
 
-  renderCSSText([cssText]);
+  renderCSSText([cssText], config);
 
   return animationName;
 }
@@ -27,7 +27,7 @@ function cssifyKeyframe(frames: KeyFrames, animationName: string) {
   return `@keyframes ${animationName}{${keyframe}}`;
 }
 
-function generateAnimationName(id: number) {
+function generateAnimationName(id: number, config: Configuration) {
   return `${config.classNamePrefix}anim-${id}`;
 }
 
