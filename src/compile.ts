@@ -4,7 +4,6 @@ import renderCSSText from './libs/renderCSSText';
 import {
   ActiveModes,
   CompiledStyleSheet,
-  ComputedStyleSheet,
   StyleDeclaration,
   StyleRule,
 } from './types';
@@ -13,15 +12,6 @@ export default function compile<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
 ): CompiledStyleSheet<keyof StyleSet> {
   const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles);
-  const cssText = cssTextForStyles(newStyles);
-  renderCSSText(cssText);
-  return classNames;
-}
-
-export function createSimple<StyleSet extends StyleDeclaration>(
-  styles: StyleSet,
-): ComputedStyleSheet<keyof StyleSet> {
-  const {styles: newStyles, classNames} = setClassNamesForStyles<ComputedStyleSheet<keyof StyleSet>>(styles);
   const cssText = cssTextForStyles(newStyles);
   renderCSSText(cssText);
   return classNames;
