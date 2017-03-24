@@ -68,7 +68,7 @@ function setClassNamesForStyle(
       key = `&.${modeClassName}`;
     }
 
-    if (value instanceof Object && !Array.isArray(value)) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
       newStyle[key] = setClassNamesForStyle(newKeys, value as StyleRule, classNamesForModes);
     } else {
       newStyle[key] = value;

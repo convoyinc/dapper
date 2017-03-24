@@ -64,6 +64,25 @@ describe(`compile`, () => {
       `}`]);
   });
 
+  it(`applies plugins deeply`, () => {
+    const className = compile({
+      root: {
+        blah: {
+          flex:1,
+          margin: 5,
+          paddingHorizontal: 4,
+        },
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub).to.have.been.calledWith([
+      `.dapper-root-a blah{` +
+        `-webkit-flex:1;-ms-flex:1;flex:1;` +
+        `margin:5px;` +
+        `padding-left:4px;padding-right:4px` +
+      `}`]);
+  });
+
   it(`handles pseudo tags`, () => {
     const className = compile({
       root: {
