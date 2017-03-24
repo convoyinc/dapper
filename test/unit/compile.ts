@@ -218,4 +218,22 @@ describe(`compile`, () => {
       '.dapper-root-a{color:blue;color:green}',
     ]);
   });
+
+  it(`supports rule name replacement`, () => {
+    const className = compile({
+      root: {
+        color: 'red',
+      },
+      child: {
+        '{root}:hover &': {
+          color: 'blue',
+        },
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a', child: 'dapper-child-b'});
+    expect(renderCSSTextStub).to.have.been.calledWith([
+      `.dapper-root-a{color:red}`,
+      `.dapper-root-a:hover .dapper-child-b{color:blue}`,
+    ]);
+  });
 });

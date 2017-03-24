@@ -57,6 +57,7 @@ function cssRuleForValueAndPaths(valueAndPaths: ValueAndPath[]) {
     const medias: string[] = [];
     let pseudos: string[] = [];
 
+    // Go in reverse to find the first key that can be a property
     path.reverse().forEach(key => {
       const isPseudo = isPropertyPseudo(key);
       const isMediaQuery = isPropertyMediaQuery(key);

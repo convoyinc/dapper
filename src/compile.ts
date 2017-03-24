@@ -8,22 +8,25 @@ import {
   StyleRule,
 } from './types';
 
+const PLACEHOLDER_REGEX = /\{([^\}]+)\}/g;
+
 export default function compile<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
 ): CompiledStyleSheet<keyof StyleSet> {
-  const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles);
+  const { styles: newStyles, compiledStyles } = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles);
   const cssText = cssTextForStyles(newStyles);
   renderCSSText(cssText);
-  return classNames;
+  return compiledStyles;
 }
 
 // Replaces top level keys with css className text '.keyClassName'
 // and replaces $modes with LESS style parent selector '&.modeClassName'
 function setClassNamesForStyles<T>(
   styles: StyleDeclaration,
-): {classNames: T, styles: StyleDeclaration} {
-  const newStyles: StyleDeclaration = {};
-  const classNames: any = {};
+): {compiledStyles: T, styles: StyleDeclaration} {
+  let newStyles: StyleDeclaration = {};
+  const compiledStyles: any = {};
+  const classNames: {[k: string]: string} = {};
 
   for (const key in styles) {
     const classNamesForModes: {[k: string]: string} = {};
@@ -33,10 +36,12 @@ function setClassNamesForStyles<T>(
 
     newStyles[newKey] = setClassNamesForStyle([key], value, classNamesForModes);
 
-    classNames[key] = getCompiledStyle(name, classNamesForModes);
-  }
+    compiledStyles[key] = getCompiledStyle(name, classNamesForModes);
 
-  return { styles: newStyles, classNames };
+    classNames[key] = newKey;
+  }
+  newStyles = substitutePlaceholders(newStyles, classNames);
+  return { styles: newStyles, compiledStyles };
 }
 
 function setClassNamesForStyle(
@@ -86,4 +91,34 @@ function getCompiledStyle(className: string, classNamesForModes: {[key: string]:
       return names.join(' ');
     };
   }
+}
+
+function substitutePlaceholders(
+  styles: StyleDeclaration,
+  classNames: {[k: string]: string },
+): StyleDeclaration {
+  for (const key in styles) {
+    const value = styles[key];
+    _substitutePlaceholders(value, classNames);
+  }
+  return styles;
+}
+
+function _substitutePlaceholders(
+  styles: StyleRule,
+  classNames: {[k: string]: string },
+): StyleRule {
+  for (const key in styles) {
+    const value = styles[key];
+    const newKey = key.replace(PLACEHOLDER_REGEX, (_substr: string, p1: string) => classNames[p1]);
+
+    if (newKey !== key) {
+      styles[newKey] = value;
+      delete styles[newKey];
+    }
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      _substitutePlaceholders(value, classNames);
+    }
+  }
+  return styles;
 }
