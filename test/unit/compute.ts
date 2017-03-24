@@ -9,7 +9,7 @@ proxyquire.noCallThru();
 const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
 
-const {default: create } = proxyquire('../../src/create', {
+const {default: compile } = proxyquire('../../src/compile', {
   './libs/renderCSSText': stub,
 });
 
@@ -30,7 +30,7 @@ describe(`compute`, () => {
   });
 
   it(`handles mode declarations`, () => {
-    const className = create({
+    const className = compile({
       root: {
         $ghost: {
           color: 'red',
@@ -47,7 +47,7 @@ describe(`compute`, () => {
   });
 
   it(`allows modes as children of property`, () => {
-    const className = create({
+    const className = compile({
       root: {
         color: {
           $red: 'red',

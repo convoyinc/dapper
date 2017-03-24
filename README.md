@@ -122,7 +122,7 @@ export interface State {
 
 export type ModeState = { props: Props, state: State };
 
-const STYLES = StyleSheet.create({
+const STYLES = StyleSheet.compile({
   root: {
     display: 'flex',
     backgroundColor: '#BBB',
@@ -223,7 +223,7 @@ const fadeOut = StyleSheet.keyframes({
   },
 });
 
-const STYLES = StyleSheet.create({
+const STYLES = StyleSheet.compile({
   root: {
     animation: `5s ${fadeOut} linear`,
   },

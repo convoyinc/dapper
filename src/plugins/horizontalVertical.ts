@@ -1,8 +1,11 @@
 import { StyleRule } from '../types';
 
-export default function horizontalVertical(style: StyleRule) {
+export default function horizontalVertical(style: StyleRule): StyleRule {
   for (const property in style) {
-    if (property === 'paddingHorizontal') {
+    const cssValue = style[property];
+    if (typeof cssValue === 'object' && !Array.isArray(cssValue)) {
+      style[property] = horizontalVertical(cssValue as StyleRule);
+    } else if (property === 'paddingHorizontal') {
       style['paddingLeft'] = style[property];
       style['paddingRight'] = style[property];
       delete style[property];
