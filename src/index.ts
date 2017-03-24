@@ -1,7 +1,7 @@
 import reactTo from './reactTo';
 import compute from './compute';
 import configure, { Configuration } from './configure';
-import compile, { createSimple } from './compile';
+import compile from './compile';
 import keyframes from './keyframes';
 import renderStatic from './renderStatic';
 import { StyleRule } from './types';
@@ -12,7 +12,6 @@ export {
   compute,
   configure,
   compile,
-  createSimple,
   keyframes,
   reactTo,
   renderStatic,
