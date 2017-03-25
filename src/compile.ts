@@ -1,5 +1,5 @@
 import generateClassName from './libs/generateClassName';
-import cssTextForStyles from './libs/cssTextForStyles';
+import cssTextForStyles, { isPropertyPseudo } from './libs/cssTextForStyles';
 import renderCSSText from './libs/renderCSSText';
 import {
   ActiveModes,
@@ -13,15 +13,18 @@ const PLACEHOLDER_REGEX = /\{([^\}]+)\}/g;
 export default function compile<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
 ): CompiledStyleSheet<keyof StyleSet> {
-  const { styles: newStyles, compiledStyles } = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles);
+  const {
+    styles: newStyles,
+    compiledStyles,
+  } = setClassNamesForStyleDeclaration<CompiledStyleSheet<keyof StyleSet>>(styles);
   const cssText = cssTextForStyles(newStyles);
   renderCSSText(cssText);
   return compiledStyles;
 }
 
 // Replaces top level keys with css className text '.keyClassName'
-// and replaces $modes with LESS style parent selector '&.modeClassName'
-function setClassNamesForStyles<T>(
+// Replaces $modes with LESS style parent selector '&.modeClassName'
+function setClassNamesForStyleDeclaration<T>(
   styles: StyleDeclaration,
 ): {compiledStyles: T, styles: StyleDeclaration} {
   let newStyles: StyleDeclaration = {};
@@ -34,7 +37,7 @@ function setClassNamesForStyles<T>(
     const name = generateClassName([key]);
     const newKey = `.${name}`;
 
-    newStyles[newKey] = setClassNamesForStyle([key], value, classNamesForModes);
+    newStyles[newKey] = setClassNamesForStyleRule([key], value, classNamesForModes);
 
     compiledStyles[key] = getCompiledStyle(name, classNamesForModes);
 
@@ -44,7 +47,7 @@ function setClassNamesForStyles<T>(
   return { styles: newStyles, compiledStyles };
 }
 
-function setClassNamesForStyle(
+function setClassNamesForStyleRule(
   keys: string[],
   style: StyleRule,
   classNamesForModes: {[k: string]: string},
@@ -63,8 +66,12 @@ function setClassNamesForStyle(
       key = `&.${modeClassName}`;
     }
 
+    if (key.indexOf('&') !== -1 && keys.length && isPropertyPseudo(keys[keys.length - 1])) {
+      throw new Error(`Cannot have a parent selector as child of pseudo class/element: ${newKeys.join('|')}`);
+    }
+
     if (typeof value === 'object' && !Array.isArray(value)) {
-      newStyle[key] = setClassNamesForStyle(newKeys, value as StyleRule, classNamesForModes);
+      newStyle[key] = setClassNamesForStyleRule(newKeys, value as StyleRule, classNamesForModes);
     } else {
       newStyle[key] = value;
     }
@@ -114,7 +121,7 @@ function _substitutePlaceholders(
 
     if (newKey !== key) {
       styles[newKey] = value;
-      delete styles[newKey];
+      delete styles[key];
     }
     if (typeof value === 'object' && !Array.isArray(value)) {
       _substitutePlaceholders(value, classNames);

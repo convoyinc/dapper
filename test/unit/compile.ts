@@ -236,4 +236,16 @@ describe(`compile`, () => {
       `.dapper-root-a:hover .dapper-child-b{color:blue}`,
     ]);
   });
+
+  it(`throws if parent selector is child of pseudo`, () => {
+    expect(() => compile({
+      root: {
+        ':hover': {
+          $mode: {
+            color: 'blue',
+          },
+        },
+      },
+    })).to.throw;
+  });
 });

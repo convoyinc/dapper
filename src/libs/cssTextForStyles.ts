@@ -53,39 +53,44 @@ function cssRuleForValueAndPaths(valueAndPaths: ValueAndPath[]) {
     const { path, value } = valueAndPath;
     let property: string|null = null;
     let selector = '';
-    let parentSelectors: string[] = [];
     const medias: string[] = [];
-    let pseudos: string[] = [];
 
-    // Go in reverse to find the first key that can be a property
-    path.reverse().forEach(key => {
+    // Finds the last key which could be a css property
+    let index = path.length - 1;
+    for (; index >= 0; index--) {
+      const key = path[index];
+      if (key.search(/\:|\&|\@|\./) === -1) {
+        property = key;
+        break;
+      }
+    }
+
+    if (!property) {
+      throw new Error(`No CSS property provided, just selectors ${path.join(', ')} for value ${JSON.stringify(value)}`);
+    }
+
+    // Remove the css property
+    path.splice(index, 1);
+
+    // Build up the selector
+    path.forEach(key => {
       const isPseudo = isPropertyPseudo(key);
       const isMediaQuery = isPropertyMediaQuery(key);
-      const isParentSelector = isPropertyParentSelector(key);
+      const isParentSelector = hasParentSelector(key);
 
       if (isParentSelector) {
-        parentSelectors.push(key.slice(1).trim());
-
-      } else if (isPseudo) {
-        pseudos.push(key);
+        selector = key.replace(/\&/g, selector);
 
       } else if (isMediaQuery) {
         medias.push(key.slice(6).trim());
 
-      } else if (property) {
-        selector = `${key}${parentSelectors.join('')}${pseudos.reverse().join('')} ` + selector;
-        parentSelectors = [];
-        pseudos = [];
+      } else if (isPseudo) {
+        selector += key;
 
       } else {
-        property = key;
-
+        selector += selector ? ` ${key}` : key;
       }
     });
-
-    if (!property) {
-      throw new Error(`No CSS property provided, just selector ${selector} for value ${JSON.stringify(value)}`);
-    }
 
     if (!selector) {
       throw new Error(`No CSS selector provided, just property ${property} for value ${JSON.stringify(value)}`);
@@ -94,9 +99,9 @@ function cssRuleForValueAndPaths(valueAndPaths: ValueAndPath[]) {
     const declaration = generateCSSDeclaration(property, value);
 
     return {
-      selector: selector.trim(),
+      selector,
       declaration,
-      media: generateCombinedMediaQuery(medias.reverse()),
+      media: generateCombinedMediaQuery(medias),
     };
   });
 
@@ -140,7 +145,7 @@ function generateCombinedMediaQuery(medias: string[]) {
   return `@media ${medias.join(' and ')}`;
 }
 
-function isPropertyPseudo(property: string) {
+export function isPropertyPseudo(property: string) {
   return property.charAt(0) === ':';
 }
 
@@ -148,6 +153,6 @@ function isPropertyMediaQuery(property: string) {
   return property.substr(0, 6) === '@media';
 }
 
-function isPropertyParentSelector(property: string) {
-  return property.charAt(0) === '&';
+function hasParentSelector(property: string) {
+  return property.indexOf('&') !== -1;
 }
