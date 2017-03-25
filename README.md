@@ -1,4 +1,7 @@
 # Dapper
+[![CircleCI](https://img.shields.io/circleci/project/github/convoyinc/dapper.svg)](https://circleci.com/gh/convoyinc/dapper)
+[![Codecov](https://img.shields.io/codecov/c/github/convoyinc/dapper.svg)](https://codecov.io/gh/convoyinc/dapper)
+[![npm (scoped)](https://img.shields.io/npm/v/@convoy/dapper.svg)](https://www.npmjs.com/package/@convoy/dapper)
 
 Dapper is a Javascript/TypeScript styling library (CSS-in-JS or CSS-in-TS). It features:
  - Dynamic styles using modes, (i.e. in React it styles based on props and state)
