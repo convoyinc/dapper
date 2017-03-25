@@ -1,8 +1,8 @@
 # Dapper
 
 Dapper is a Javascript/TypeScript styling library (CSS-in-JS or CSS-in-TS). It features:
- - Dynamic styles, such as in React based on props and state, with better separation via modes
- - Typescript autocomplete and build-time checks
+ - Dynamic styles using modes, (i.e. in React it styles based on props and state)
+ - TypeScript autocomplete and build-time checks
 
  - Utilizes some of the best features of LESS/SASS CSS such as
     - nested styles
@@ -11,8 +11,8 @@ Dapper is a Javascript/TypeScript styling library (CSS-in-JS or CSS-in-TS). It f
     - media queries
     - keyframes
     - pseudo classes and psuedo elements
-    - auto-prefixing
-    - unitless values (5 => '5px')
+    - auto-prefixing (for cross-browser compatibility)
+    - unitless values (use 5 instead of '5px')
     - paddingHorizontal, paddingVertical, and same for margin
  - Additional helpers to inject arbitrary CSS (great when styling 3rd party code)
 
