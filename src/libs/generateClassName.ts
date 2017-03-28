@@ -1,11 +1,11 @@
-import { config } from '../configure';
+import { Configuration } from '../configure';
 
 let uniqueRuleIdentifier = 0;
 
 const CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const CHAR_LENGTH = CHARS.length;
 
-export default function generateClassName(ids: string[]) {
+export default function generateClassName(ids: string[], config: Configuration) {
   const friendlyName = config.friendlyClassNames ? ids.map(id => `${id}-`).join('') : '';
   return config.classNamePrefix + friendlyName + _generateClassName(++uniqueRuleIdentifier);
 }

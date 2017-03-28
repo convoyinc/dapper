@@ -7,13 +7,16 @@ import {
   StyleDeclaration,
   StyleRule,
 } from './types';
+import { config as defaultConfig, Configuration } from './configure';
 
 export default function compile<StyleSet extends StyleDeclaration>(
   styles: StyleSet,
+  config: Configuration = defaultConfig,
 ): CompiledStyleSheet<keyof StyleSet> {
-  const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles);
+  config = { ...defaultConfig, ...config };
+  const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles, config);
   const cssText = cssTextForStyles(newStyles);
-  renderCSSText(cssText);
+  renderCSSText(cssText, config);
   return classNames;
 }
 
@@ -21,6 +24,7 @@ export default function compile<StyleSet extends StyleDeclaration>(
 // and replaces $modes with LESS style parent selector '&.modeClassName'
 function setClassNamesForStyles<T>(
   styles: StyleDeclaration,
+  config: Configuration,
 ): {classNames: T, styles: StyleDeclaration} {
   const newStyles: StyleDeclaration = {};
   const classNames: any = {};
@@ -28,10 +32,10 @@ function setClassNamesForStyles<T>(
   for (const key in styles) {
     const classNamesForModes: {[k: string]: string} = {};
     const value = styles[key];
-    const name = generateClassName([key]);
+    const name = generateClassName([key], config);
     const newKey = `.${name}`;
 
-    newStyles[newKey] = setClassNamesForStyle([key], value, classNamesForModes);
+    newStyles[newKey] = setClassNamesForStyle([key], value, classNamesForModes, config);
 
     classNames[key] = getCompiledStyle(name, classNamesForModes);
   }
@@ -43,6 +47,7 @@ function setClassNamesForStyle(
   keys: string[],
   style: StyleRule,
   classNamesForModes: {[k: string]: string},
+  config: Configuration,
 ) {
   const newStyle: StyleRule = {};
   for (let key in style) {
@@ -53,13 +58,13 @@ function setClassNamesForStyle(
       newKeys = keys.concat(mode);
       let modeClassName = classNamesForModes[mode];
       if (!modeClassName) {
-        modeClassName = classNamesForModes[mode] = generateClassName(newKeys);
+        modeClassName = classNamesForModes[mode] = generateClassName(newKeys, config);
       }
       key = `&.${modeClassName}`;
     }
 
     if (typeof value === 'object' && !Array.isArray(value)) {
-      newStyle[key] = setClassNamesForStyle(newKeys, value as StyleRule, classNamesForModes);
+      newStyle[key] = setClassNamesForStyle(newKeys, value as StyleRule, classNamesForModes, config);
     } else {
       newStyle[key] = value;
     }
