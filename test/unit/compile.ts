@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as sinon from 'sinon';
 import * as proxyquire from 'proxyquire';
 import configure from '../../src/configure';
@@ -52,8 +53,12 @@ describe(`compile`, () => {
       },
     }, { classNamePrefix: 'dap-' });
     expect(className).to.deep.equal({root: 'dap-root-a'});
-    expect(renderCSSTextStub).to.have.been.calledWith([`.dap-root-a{background-color:red;color:blue;padding:5px;` +
-      `display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex}`]);
+    expect(renderCSSTextStub).to.have.been.calledWith(sinon.match((value: string) => {
+      if (!_.isArray(value) || value.length !== 1) {
+        return false;
+      }
+      return /\.dap-root-a\{[^}]+\}/.test(value);
+    }));
   });
 
   it(`applies plugins`, () => {
