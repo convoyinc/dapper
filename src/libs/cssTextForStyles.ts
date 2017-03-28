@@ -82,7 +82,7 @@ function cssRuleForValueAndPaths(valueAndPaths: ValueAndPath[]) {
       } else if (isMediaQuery(key)) {
         medias.push(key.slice(6).trim());
 
-      } else if (isPseudoSelector) {
+      } else if (isPseudoSelector(key)) {
         selector += key;
 
       } else {
