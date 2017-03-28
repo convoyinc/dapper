@@ -13,7 +13,7 @@ const CSS_PROPERTY_REGEX = /-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
 
 // Given LESS-like styles { '.className': { '&.modeClassName': { fontSize: 5 }}}
 // Returns CSS text to render
-export default function cssTextForStyles(styles: StyleDeclaration): string[] {
+export default function cssTextForStyles(styles: StyleDeclaration<string>): string[] {
   const valueAndPaths: ValueAndPath[] = [];
   _.forEach(styles, (style, key: string) => {
     if (typeof style !== 'object') {

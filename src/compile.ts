@@ -10,13 +10,13 @@ import {
 
 const PLACEHOLDER_REGEX = /\{([^\}]+)\}/g;
 
-export default function compile<StyleSet extends StyleDeclaration>(
-  styles: StyleSet,
-): CompiledStyleSheet<keyof StyleSet> {
+export default function compile<TKeys extends string>(
+  styles: StyleDeclaration<TKeys>,
+): CompiledStyleSheet<TKeys> {
   const {
     styles: newStyles,
     compiledStyles,
-  } = setClassNamesForStyleDeclaration<CompiledStyleSheet<keyof StyleSet>>(styles);
+  } = setClassNamesForStyleDeclaration(styles);
   const cssText = cssTextForStyles(newStyles);
   renderCSSText(cssText);
   return compiledStyles;
@@ -24,10 +24,10 @@ export default function compile<StyleSet extends StyleDeclaration>(
 
 // Replaces top level keys with css className text '.keyClassName'
 // Replaces $modes with LESS style parent selector '&.modeClassName'
-function setClassNamesForStyleDeclaration<T>(
-  styles: StyleDeclaration,
-): {compiledStyles: T, styles: StyleDeclaration} {
-  let newStyles: StyleDeclaration = {};
+function setClassNamesForStyleDeclaration<TKeys extends string>(
+  styles: StyleDeclaration<TKeys>,
+): {compiledStyles: CompiledStyleSheet<TKeys>, styles: StyleDeclaration<string>} {
+  let newStyles: StyleDeclaration<string> = {};
   const compiledStyles: any = {};
   const classNames: {[k: string]: string} = {};
 
@@ -39,7 +39,7 @@ function setClassNamesForStyleDeclaration<T>(
 
     newStyles[newKey] = setClassNamesForStyleRule([key], value, classNamesForModes);
 
-    compiledStyles[key] = getCompiledStyle(name, classNamesForModes);
+    compiledStyles[key] = getCompiledClassName(name, classNamesForModes);
 
     classNames[key] = newKey;
   }
@@ -84,7 +84,7 @@ function isPropertyMode(property: string) {
   return property.charAt(0) === '$';
 }
 
-function getCompiledStyle(className: string, classNamesForModes: {[key: string]: string}) {
+function getCompiledClassName(className: string, classNamesForModes: {[key: string]: string}) {
   if (!Object.keys(classNamesForModes).length) {
     return className;
   } else {
@@ -101,9 +101,9 @@ function getCompiledStyle(className: string, classNamesForModes: {[key: string]:
 }
 
 function substitutePlaceholders(
-  styles: StyleDeclaration,
+  styles: StyleDeclaration<string>,
   classNames: {[k: string]: string},
-): StyleDeclaration {
+): StyleDeclaration<string> {
   for (const key in styles) {
     const value = styles[key];
     _substitutePlaceholders(value, classNames);
