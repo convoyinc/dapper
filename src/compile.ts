@@ -7,18 +7,21 @@ import {
   StyleDeclaration,
   StyleRule,
 } from './types';
+import { config as defaultConfig, Configuration } from './configure';
 
 const PLACEHOLDER_REGEX = /\{([^\}]+)\}/g;
 
 export default function compile<TKeys extends string>(
   styles: StyleDeclaration<TKeys>,
+  config: Configuration = defaultConfig,
 ): CompiledStyleSheet<TKeys> {
+  config = { ...defaultConfig, ...config };
   const {
     styles: newStyles,
     compiledStyles,
-  } = setClassNamesForStyleDeclaration(styles);
+  } = setClassNamesForStyleDeclaration(styles, config);
   const cssText = cssTextForStyles(newStyles);
-  renderCSSText(cssText);
+  renderCSSText(cssText, config);
   return compiledStyles;
 }
 
@@ -26,6 +29,7 @@ export default function compile<TKeys extends string>(
 // Replaces $modes with LESS style parent selector '&.modeClassName'
 function setClassNamesForStyleDeclaration<TKeys extends string>(
   styles: StyleDeclaration<TKeys>,
+  config: Configuration,
 ): {compiledStyles: CompiledStyleSheet<TKeys>, styles: StyleDeclaration<string>} {
   let newStyles: StyleDeclaration<string> = {};
   const compiledStyles: any = {};
@@ -34,10 +38,10 @@ function setClassNamesForStyleDeclaration<TKeys extends string>(
   for (const key in styles) {
     const classNamesForModes: {[k: string]: string} = {};
     const value = styles[key];
-    const name = generateClassName([key]);
+    const name = generateClassName([key], config);
     const newKey = `.${name}`;
 
-    newStyles[newKey] = setClassNamesForStyleRule([key], value, classNamesForModes);
+    newStyles[newKey] = setClassNamesForStyleRule([key], value, classNamesForModes, config);
 
     compiledStyles[key] = getCompiledClassName(name, classNamesForModes);
 
@@ -51,6 +55,7 @@ function setClassNamesForStyleRule(
   keys: string[],
   style: StyleRule,
   classNamesForModes: {[k: string]: string},
+  config: Configuration,
 ) {
   const newStyle: StyleRule = {};
   for (let key in style) {
@@ -61,7 +66,7 @@ function setClassNamesForStyleRule(
       newKeys = keys.concat(mode);
       let modeClassName = classNamesForModes[mode];
       if (!modeClassName) {
-        modeClassName = classNamesForModes[mode] = generateClassName(newKeys);
+        modeClassName = classNamesForModes[mode] = generateClassName(newKeys, config);
       }
       key = `&.${modeClassName}`;
     }
@@ -71,7 +76,7 @@ function setClassNamesForStyleRule(
     }
 
     if (typeof value === 'object' && !Array.isArray(value)) {
-      newStyle[key] = setClassNamesForStyleRule(newKeys, value as StyleRule, classNamesForModes);
+      newStyle[key] = setClassNamesForStyleRule(newKeys, value as StyleRule, classNamesForModes, config);
     } else {
       newStyle[key] = value;
     }
