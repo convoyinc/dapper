@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as sinon from 'sinon';
 import * as proxyquire from 'proxyquire';
 import configure from '../../src/configure';
