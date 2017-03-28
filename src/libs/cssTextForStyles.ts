@@ -9,7 +9,7 @@ interface ValueAndPath {
   value: string|number;
 }
 
-const CSS_PROPERTY_REGEX = /-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
+const CSS_PROPERTY_REGEX = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*$/;
 
 // Given LESS-like styles { '.className': { '&.modeClassName': { fontSize: 5 }}}
 // Returns CSS text to render
