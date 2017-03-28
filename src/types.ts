@@ -19,7 +19,7 @@ export type StyleRule = {[key: string]: StyleValue|StyleValue[]|StyleRule};
  * A collection of style rules represented by JavaScript Objects, which are
  * eventually flattened, and compiled down into actual CSS rules.
  */
-export type StyleDeclaration = {[key: string]: StyleRule};
+export type StyleDeclaration<TKeys extends string> = { [TKey in TKeys]: StyleRule };
 
 /**
  * A map of predicate functions that declare the modes that should be made

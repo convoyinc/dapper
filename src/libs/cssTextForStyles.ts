@@ -9,9 +9,11 @@ interface ValueAndPath {
   value: string|number;
 }
 
+const CSS_PROPERTY_REGEX = /^-?[_a-z][_a-z0-9-]*$/i;
+
 // Given LESS-like styles { '.className': { '&.modeClassName': { fontSize: 5 }}}
 // Returns CSS text to render
-export default function cssTextForStyles(styles: StyleDeclaration): string[] {
+export default function cssTextForStyles(styles: StyleDeclaration<string>): string[] {
   const valueAndPaths: ValueAndPath[] = [];
   _.forEach(styles, (style, key: string) => {
     if (typeof style !== 'object') {
@@ -53,38 +55,40 @@ function cssRuleForValueAndPaths(valueAndPaths: ValueAndPath[]) {
     const { path, value } = valueAndPath;
     let property: string|null = null;
     let selector = '';
-    let parentSelectors: string[] = [];
     const medias: string[] = [];
-    let pseudos: string[] = [];
 
-    path.reverse().forEach(key => {
-      const isPseudo = isPropertyPseudo(key);
-      const isMediaQuery = isPropertyMediaQuery(key);
-      const isParentSelector = isPropertyParentSelector(key);
-
-      if (isParentSelector) {
-        parentSelectors.push(key.slice(1).trim());
-
-      } else if (isPseudo) {
-        pseudos.push(key);
-
-      } else if (isMediaQuery) {
-        medias.push(key.slice(6).trim());
-
-      } else if (property) {
-        selector = `${key}${parentSelectors.join('')}${pseudos.reverse().join('')} ` + selector;
-        parentSelectors = [];
-        pseudos = [];
-
-      } else {
+    // Finds the last key which could be a css property
+    let index = path.length - 1;
+    for (; index >= 0; index--) {
+      const key = path[index];
+      if (CSS_PROPERTY_REGEX.test(key)) {
         property = key;
-
+        break;
       }
-    });
+    }
 
     if (!property) {
-      throw new Error(`No CSS property provided, just selector ${selector} for value ${JSON.stringify(value)}`);
+      throw new Error(`No CSS property provided, just selectors ${path.join(', ')} for value ${JSON.stringify(value)}`);
     }
+
+    // Remove the css property
+    path.splice(index, 1);
+
+    // Build up the selector
+    path.forEach(key => {
+      if (hasParentSelector(key)) {
+        selector = key.replace(/\&/g, selector);
+
+      } else if (isMediaQuery(key)) {
+        medias.push(key.slice(6).trim());
+
+      } else if (isPseudoSelector(key)) {
+        selector += key;
+
+      } else {
+        selector += selector ? ` ${key}` : key;
+      }
+    });
 
     if (!selector) {
       throw new Error(`No CSS selector provided, just property ${property} for value ${JSON.stringify(value)}`);
@@ -93,9 +97,9 @@ function cssRuleForValueAndPaths(valueAndPaths: ValueAndPath[]) {
     const declaration = generateCSSDeclaration(property, value);
 
     return {
-      selector: selector.trim(),
+      selector,
       declaration,
-      media: generateCombinedMediaQuery(medias.reverse()),
+      media: generateCombinedMediaQuery(medias),
     };
   });
 
@@ -139,14 +143,14 @@ function generateCombinedMediaQuery(medias: string[]) {
   return `@media ${medias.join(' and ')}`;
 }
 
-function isPropertyPseudo(property: string) {
+export function isPseudoSelector(property: string) {
   return property.charAt(0) === ':';
 }
 
-function isPropertyMediaQuery(property: string) {
+function isMediaQuery(property: string) {
   return property.substr(0, 6) === '@media';
 }
 
-function isPropertyParentSelector(property: string) {
-  return property.charAt(0) === '&';
+function hasParentSelector(property: string) {
+  return property.indexOf('&') !== -1;
 }

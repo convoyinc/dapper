@@ -1,5 +1,5 @@
 import generateClassName from './libs/generateClassName';
-import cssTextForStyles from './libs/cssTextForStyles';
+import cssTextForStyles, { isPseudoSelector } from './libs/cssTextForStyles';
 import renderCSSText from './libs/renderCSSText';
 import {
   ActiveModes,
@@ -9,25 +9,31 @@ import {
 } from './types';
 import { config as defaultConfig, Configuration } from './configure';
 
-export default function compile<StyleSet extends StyleDeclaration>(
-  styles: StyleSet,
+const PLACEHOLDER_REGEX = /\{([^\}]+)\}/g;
+
+export default function compile<TKeys extends string>(
+  styles: StyleDeclaration<TKeys>,
   config: Configuration = defaultConfig,
-): CompiledStyleSheet<keyof StyleSet> {
+): CompiledStyleSheet<TKeys> {
   config = { ...defaultConfig, ...config };
-  const {styles: newStyles, classNames} = setClassNamesForStyles<CompiledStyleSheet<keyof StyleSet>>(styles, config);
+  const {
+    styles: newStyles,
+    compiledStyles,
+  } = setClassNamesForStyleDeclaration(styles, config);
   const cssText = cssTextForStyles(newStyles);
   renderCSSText(cssText, config);
-  return classNames;
+  return compiledStyles;
 }
 
 // Replaces top level keys with css className text '.keyClassName'
-// and replaces $modes with LESS style parent selector '&.modeClassName'
-function setClassNamesForStyles<T>(
-  styles: StyleDeclaration,
+// Replaces $modes with LESS style parent selector '&.modeClassName'
+function setClassNamesForStyleDeclaration<TKeys extends string>(
+  styles: StyleDeclaration<TKeys>,
   config: Configuration,
-): {classNames: T, styles: StyleDeclaration} {
-  const newStyles: StyleDeclaration = {};
-  const classNames: any = {};
+): {compiledStyles: CompiledStyleSheet<TKeys>, styles: StyleDeclaration<string>} {
+  let newStyles: StyleDeclaration<string> = {};
+  const compiledStyles: any = {};
+  const classNames: {[k: string]: string} = {};
 
   for (const key in styles) {
     const classNamesForModes: {[k: string]: string} = {};
@@ -35,15 +41,17 @@ function setClassNamesForStyles<T>(
     const name = generateClassName([key], config);
     const newKey = `.${name}`;
 
-    newStyles[newKey] = setClassNamesForStyle([key], value, classNamesForModes, config);
+    newStyles[newKey] = setClassNamesForStyleRule([key], value, classNamesForModes, config);
 
-    classNames[key] = getCompiledStyle(name, classNamesForModes);
+    compiledStyles[key] = getCompiledClassName(name, classNamesForModes);
+
+    classNames[key] = newKey;
   }
-
-  return { styles: newStyles, classNames };
+  newStyles = substitutePlaceholders(newStyles, classNames);
+  return { styles: newStyles, compiledStyles };
 }
 
-function setClassNamesForStyle(
+function setClassNamesForStyleRule(
   keys: string[],
   style: StyleRule,
   classNamesForModes: {[k: string]: string},
@@ -63,8 +71,12 @@ function setClassNamesForStyle(
       key = `&.${modeClassName}`;
     }
 
+    if (key.indexOf('&') !== -1 && keys.length && isPseudoSelector(keys[keys.length - 1])) {
+      throw new Error(`Cannot have a parent selector as child of pseudo class/element: ${newKeys.join('|')}`);
+    }
+
     if (typeof value === 'object' && !Array.isArray(value)) {
-      newStyle[key] = setClassNamesForStyle(newKeys, value as StyleRule, classNamesForModes, config);
+      newStyle[key] = setClassNamesForStyleRule(newKeys, value as StyleRule, classNamesForModes, config);
     } else {
       newStyle[key] = value;
     }
@@ -77,7 +89,7 @@ function isPropertyMode(property: string) {
   return property.charAt(0) === '$';
 }
 
-function getCompiledStyle(className: string, classNamesForModes: {[key: string]: string}) {
+function getCompiledClassName(className: string, classNamesForModes: {[key: string]: string}) {
   if (!Object.keys(classNamesForModes).length) {
     return className;
   } else {
@@ -91,4 +103,40 @@ function getCompiledStyle(className: string, classNamesForModes: {[key: string]:
       return names.join(' ');
     };
   }
+}
+
+function substitutePlaceholders(
+  styles: StyleDeclaration<string>,
+  classNames: {[k: string]: string},
+): StyleDeclaration<string> {
+  for (const key in styles) {
+    const value = styles[key];
+    _substitutePlaceholders(value, classNames);
+  }
+  return styles;
+}
+
+function _substitutePlaceholders(
+  styles: StyleRule,
+  classNames: {[k: string]: string},
+): StyleRule {
+  for (const key in styles) {
+    const value = styles[key];
+    const newKey = key.replace(PLACEHOLDER_REGEX, (_substr: string, p1: string) => {
+      const className = classNames[p1];
+      if (!className) {
+        throw new Error(`Cannot find StyleRule key ${p1} referenced in placeholder ${key}`);
+      }
+      return className;
+    });
+
+    if (newKey !== key) {
+      styles[newKey] = value;
+      delete styles[key];
+    }
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      _substitutePlaceholders(value, classNames);
+    }
+  }
+  return styles;
 }

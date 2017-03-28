@@ -1,8 +1,31 @@
 # Dapper
+[![CircleCI](https://img.shields.io/circleci/project/github/convoyinc/dapper.svg)](https://circleci.com/gh/convoyinc/dapper)
+[![Codecov](https://img.shields.io/codecov/c/github/convoyinc/dapper.svg)](https://codecov.io/gh/convoyinc/dapper)
+[![npm (scoped)](https://img.shields.io/npm/v/@convoy/dapper.svg)](https://www.npmjs.com/package/@convoy/dapper)
+
+Dapper is a Javascript/TypeScript styling library (CSS-in-JS or CSS-in-TS). It features:
+ - Dynamic styles using modes, (i.e. in React it styles based on props and state)
+ - TypeScript autocomplete and build-time checks
+
+ - Utilizes some of the best features of LESS/SASS CSS such as
+    - nested styles
+    - parent selectors
+ - CSS features such as
+    - media queries
+    - keyframes
+    - pseudo classes and psuedo elements
+    - auto-prefixing (for cross-browser compatibility)
+    - unitless values (use 5 instead of '5px')
+    - paddingHorizontal, paddingVertical, and same for margin
+ - Additional helpers to inject arbitrary CSS (great when styling 3rd party code)
+
 
 ## Getting Started
 
 `npm install @convoy/dapper`
+
+## TypeScript/Javascript
+Most examples are shown in TypeScript, but dapper works great with Javascript. TypeScript provides autocompletion of your styles and build time checks that those styles exist.
 
 ## React usage
 
@@ -13,7 +36,7 @@ import * as dapper from '@convoy/dapper';
 
 const STYLES = dapper.compile({
   root: {
-    backgroundColor: '#eee',
+    padding: 5,
   },
 });
 
@@ -29,192 +52,216 @@ export default class Button extends React.Component<Props, State> {
 ```
 
 ### Dynamic Styles
+Dapper enables dynamic styles using modes, a series of functions that defines all the different "modes" or ways your component can look. This creates a nice separation of concerns removing a lot of if/else branching logic from your render function.
 
 ```tsx
 import * as dapper from '@convoy/dapper';
 
+interface Props {
+  highlight: boolean;
+}
+
 interface State {
-  hovered: boolean;
+  value: string;
 }
 
 const STYLES = dapper.compile({
   root: {
-    backgroundColor: '#eee',
-    '$hover': {
-      backgroundColor: '#fff',
+    backgroundColor: '#EEE',
+    $highlight: {
+      backgroundColor: '#FFF',
     },
   },
-  label: {
-    '$hover': {
-      color: '#999',
+  input: {
+    $tooLong: {
+      color: 'red',
     },
   },
 });
 
 const MODES = {
-  hovered: ({ state }: { state: State }) => state.hovered,
+  highlight: ({ props }: { props: Props }) => props.highlight,
+  tooLong: ({ state }: { state: State }) => state.value.length > 8,
 };
 
 export default class Button extends React.Component<Props, State> {
-  state = { hovered: false };
+  state = { value: '' };
+
   styles = dapper.reactTo(this, STYLES, MODES);
 
   render() {
     return (
-      <div
-        className={this.styles.root}
-        onMouseEnter={this._onMouseEnter}
-        onMouseLeave={this._onMouseLeave}
-      >
-        <div className={this.styles.label}>BUTTEN</div>
+      <div className={this.styles.root}>
+        <input
+          value={this.state.value}
+          onChange={this._onChange}
+        />
       </div>
     );
   }
 
-  _onMouseEnter = () => {
-    this.setState({ hovered: true });
-  }
-
-  _onMouseLeave = () => {
-    this.setState({ hovered: false });
+  _onChange = ev => {
+    this.setState({ value: ev.target.value });
   }
 }
 ```
 
+## Placeholders
+Placeholders allow you to reference other styles names inside of a style rule. This can be helpful for cascading styles.
 
-## Basic usage
+```tsx
+import * as dapper from '@convoy/dapper';
 
-```jsx
-import StyleSheet from '@convoy/dapper';
-
-const STYLES = StyleSheet.createSimple({
-  root: {
-    display: 'flex',
-    backgroundColor: '#BBB',
-    padding: 8,
-    width: '200px',
+const STYLES = dapper.compile({
+  parentA: {
+    '{child}': {
+      backgroundColor: 'red',
+    },
   },
+  parentA: {
+    '{child}': {
+      backgroundColor: 'blue',
+    },
+  },
+  child: {
+    padding: 5,
+  }
 });
 
 export default class Button extends React.Component<Props, State> {
+  styles = dapper.reactTo(this, STYLES);
+
   render() {
+    const { styles } = this;
     return (
-      <div className={STYLES.root} />
+      <div>
+        <div className={styles.parentA}>
+          <div className={styles.child} />
+        </div>
+        <div className={styles.parentB}>
+          <div className={styles.child} />
+        </div>
+      </div>
     );
   }
 }
 ```
 
-## Prop or state based styling
+## Parent selectors
+ Parent selectors allow you to swap in the current selector into a new location in a selector. This is helpful when you want to prefix the generated classname for things like global classnames.
 
-```jsx
-import StyleSheet from '@convoy/dapper';
+ ```tsx
+import * as dapper from '@convoy/dapper';
 
-export interface Props {
-  large?: boolean;
-  ghost?: boolean;
-  className?: string;
-}
-
-export interface State {
-  hovered: boolean;
-}
-
-export type ModeState = { props: Props, state: State };
-
-const STYLES = StyleSheet.compile({
+const STYLES = dapper.compile({
   root: {
-    display: 'flex',
-    backgroundColor: '#BBB',
-    padding: 8,
-    margin: {
-      $large: 10,
-      $ghost: 5,
+    'html.wf-loading &': {
+      opacity: 0,
     },
-    ':hover': {
-      backgroundColor: '#555',
-      $ghost: {
-        backgroundColor: '#000045',
-      },
+  },
+});
+
+export default class Button extends React.Component<Props, State> {
+  styles = dapper.reactTo(this, STYLES);
+
+  render() {
+    return (
+      <div className={this.styles.root}>
+        Hello World
+      </div>
+    );
+  }
+}
+```
+
+## Hover
+Placeholders and parent selectors makes it easy to support things like styling subelements based on pseudo class selectors of parents, like hover. This helps avoid creating onMouseEnter, onMouseLeave handlers.
+
+```tsx
+import * as dapper from '@convoy/dapper';
+
+const STYLES = dapper.compile({
+  root: {
+    padding: 5,
+  },
+  child: {
+    '{root}:hover &': {
+      backgroundColor: '#EEE',
     },
+  },
+});
+
+export default class Button extends React.Component<Props, State> {
+  styles = dapper.reactTo(this, STYLES);
+
+  render() {
+    return (
+      <div className={this.styles.root}>
+        <div className={this.styles.child} />
+      </div>
+    );
+  }
+}
+```
+
+## Media queries
+Dapper supports media queries even nested media queries.
+```tsx
+import * as dapper from '@convoy/dapper';
+
+const STYLES = dapper.compile({
+  root: {
+    width: 200,
     '@media (max-width: 800px)': {
-      width: '100px',
-    },
-    $ghost: {
-      backgroundColor: 'white',
-      '@media (max-width: 800px)': {
-        backgroundColor: '#DDD',
-      },
-      $large: {
-        border: '1px solid #000',
+      width: 100,
+      '@media (max-height: 500px)': {
+        width: 60,
       },
     },
-    $large: {
-      padding: '16px',
-      fontSize: '20px',
-    },
-    $hovered: {
-      borderRight: '1px solid #000',
-    },
-  },
-  text: {
-    display: 'inline-block',
   },
 });
 
-const MODES = {
-  large: ({ props }: ModeState) => !!props.large,
-  hovered: ({ state }: ModeState) => state.hovered,
-  ghost: ({ props }: ModeState) => !!props.ghost,
-};
-
 export default class Button extends React.Component<Props, State> {
-  state = {
-    hovered: false,
-  };
-
-  styles = StyleSheet.compute(STYLES, MODES, { props: this.props, state: this.state });
-
-  componentWillUpdate(props: Props, state: State) {
-    this.styles = StyleSheet.compute(STYLES, MODES, { props, state });
-  }
+  styles = dapper.reactTo(this, STYLES);
 
   render() {
     return (
-      <div
-        className={classnames(this.styles.root, this.props.className)}
-        onMouseEnter={this._onMouseEnter}
-        onMouseLeave={this._onMouseLeave}
-      >
-        {this._renderText()}
-      </div>
+      <div className={this.styles.root} />
     );
-  }
-
-  _renderText() {
-    return (
-      <span className={this.styles.text}>
-        Button
-      </span>
-    );
-  }
-
-  _onMouseEnter = () => {
-    this.setState({hovered: true});
-  }
-
-  _onMouseLeave = () => {
-    this.setState({hovered: false});
   }
 }
 ```
 
-## keyframes
+## Nesting media queries/modes/pseudo
+Media queries, modes and pseudo class/element selectors can be nested within CSS properties to make things more readable.
 
-```jsx
-import StyleSheet from '@convoy/dapper';
+```js
+const STYLES = dapper.compile({
+  root: {
+    padding: {
+      $small: 2,
+      $medium: 4,
+      $large: 8,
+    },
+    backgroundColor: {
+      ':hover': '#EEE',
+      ':focus': '#DDD',
+    },
+    width: {
+      '@media (max-width: 500px)': 100,
+      '@media (min-width: 500px)': 400,
+    },
+  },
+});
+```
 
-const fadeOut = StyleSheet.keyframes({
+## keyframes (CSS Animations)
+Dappers keyframes function generates CSS animation names which can then be referenced in styles.
+
+```tsx
+import * as dapper from '@convoy/dapper';
+
+const fadeOut = dapper.keyframes({
   '0%': {
     opacity: 0,
   },
@@ -223,34 +270,104 @@ const fadeOut = StyleSheet.keyframes({
   },
 });
 
-const STYLES = StyleSheet.compile({
+const STYLES = dapper.compile({
   root: {
     animation: `5s ${fadeOut} linear`,
   },
 });
 ```
 
-## renderStatic
+## renderStatic (arbitrary CSS)
+Sometimes you need to add arbitrary CSS to a document, such as when you are working with a third party library that controls its portion of the DOM tree.
 
 ```js
-StyleSheet.renderStatic({
+dapper.renderStatic({
   'html, body': {
     backgroundColor: '#CCFFFF',
     '@media (max-width: 800px)': {
       backgroundColor: '#FFCCFF',
     },
   },
+  '.pac-container': {
+    backgroundColor: '#EEE',
+  },
 });
 ```
 
-## configure
+## configure (Configuration settings)
+Dapper works out of the box without any configuration needed. The default configuration can overridden globally however, by providing one or many of the following parameters:
+
+`node` (optional): The style element to render styles into. Default is a newly created style element appended to document.head.
+
+`classNamePrefix` (optional): The prefix to add all generated classnames. Default if `process.env.NODE_ENV === 'production'` is `d-`, otherwise the default is `dapper-`.
+
+`friendlyClassNames` (optional): A flag dictating that all generated classnames use the full key path of the style, making it easy to identify in browser dev tools where in code is responsible for a style. Default if `process.env.NODE_ENV === 'production'` is `false`, otherwise the default is `true`.
+
+`useInsertRule` (optional): A flag dictating that when rendering to the style element whether to use CSSStyleSheet.insertRule or innerHTML. Using insertRule is faster because it means the browser has less to repeatedly parse, but is more difficult to inspect using browser dev tools. Default if `process.env.NODE_ENV === 'production'` is `true`, otherwise the default is `false`.
 
 ```js
-StyleSheet.configure({
+dapper.configure({
   node: document.querySelector('#stylesheet'),
   classNamePrefix: 'app-',
   friendlyClassNames: false,
+  useInsertRule: true,
 })
+```
+
+Configuration can also be used per call to `compile`, `keyframes` and `renderStatic` to override the global configuration. This can be useful when you want to render to a different element which allows you to separately unload those styles.
+
+```js
+dapper.compile({
+  root: {
+    padding: 5,
+  },
+}, {
+  node: document.querySelector('#styles'),
+});
+```
+
+## compute
+Dapper exposes a `compute` function which takes the output of `compile`, any functions that define the modes and an object that defines the current state to compute the modes with and returns the classnames of the various styles. This function is useful outside of React contexts and when rendering items in a list which have their own modes that aren't based directly on props or state. In React, we primarily use `reactTo`, which is a simple wrapper around `compute` that uses the component as the state to compute modes from.
+
+```tsx
+import * as dapper from '@convoy/dapper';
+
+const STYLES = dapper.compile({
+  root: {
+    width: 200,
+  },
+});
+
+const ITEM_STYLES = dapper.compile({
+  root: {
+    width: 200,
+  },
+});
+
+const ITEM_MODES = {
+  highlight: (item: Item) => item.highlight,
+};
+
+export default class Button extends React.Component<Props, State> {
+  styles = dapper.reactTo(this, STYLES);
+
+  render() {
+    return (
+      <div className={this.styles.root}>
+        {this.props.items.map(this._renderItem)}
+      </div>
+    );
+  }
+
+  _renderItem(item) {
+    const styles = dapper.compute(ITEM_STYLES, ITEM_MODES, item);
+    return (
+      <div className={styles.root}>
+        {item.label}
+      </div>
+    );
+  }
+}
 ```
 
 ## Contributing

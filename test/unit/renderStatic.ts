@@ -129,30 +129,4 @@ describe(`renderStatic`, () => {
     });
     expect(renderCSSTextStub).to.have.been.calledWith(['h1:hover{padding:4px}', 'h1:focus{padding:5px}']);
   });
-
-  it(`Handles pseudo classes with parent selectors`, () => {
-    renderStatic({
-      h1: {
-        ':hover': {
-          '&.dude': {
-            padding: 4,
-          },
-        },
-      },
-    });
-    expect(renderCSSTextStub).to.have.been.calledWith(['h1.dude:hover{padding:4px}']);
-  });
-
-  it(`Handles multiple sibline pseudo classes with parent selectors`, () => {
-    renderStatic({
-      h1: {
-        ':hover': {
-          '&.dude': {
-            padding: 4,
-          },
-        },
-      },
-    });
-    expect(renderCSSTextStub).to.have.been.calledWith(['h1.dude:hover{padding:4px}']);
-  });
 });
