@@ -250,11 +250,21 @@ describe(`compile`, () => {
     ]);
   });
 
-  it(`throws if parent selector is child of pseudo`, () => {
+  it(`throws if mode or parent selector is child of pseudo`, () => {
     expect(() => compile({
       root: {
         ':hover': {
           $mode: {
+            color: 'blue',
+          },
+        },
+      },
+    })).to.throw;
+
+    expect(() => compile({
+      root: {
+        ':hover': {
+          '&.blah': {
             color: 'blue',
           },
         },
