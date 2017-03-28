@@ -9,6 +9,8 @@ interface ValueAndPath {
   value: string|number;
 }
 
+const CSS_PROPERTY_REGEX = /-?[_a-zA-Z]+[_a-zA-Z0-9-]*/;
+
 // Given LESS-like styles { '.className': { '&.modeClassName': { fontSize: 5 }}}
 // Returns CSS text to render
 export default function cssTextForStyles(styles: StyleDeclaration): string[] {
@@ -59,7 +61,7 @@ function cssRuleForValueAndPaths(valueAndPaths: ValueAndPath[]) {
     let index = path.length - 1;
     for (; index >= 0; index--) {
       const key = path[index];
-      if (key.search(/\:|\&|\@|\./) === -1) {
+      if (CSS_PROPERTY_REGEX.test(key)) {
         property = key;
         break;
       }
@@ -74,17 +76,13 @@ function cssRuleForValueAndPaths(valueAndPaths: ValueAndPath[]) {
 
     // Build up the selector
     path.forEach(key => {
-      const isPseudo = isPropertyPseudo(key);
-      const isMediaQuery = isPropertyMediaQuery(key);
-      const isParentSelector = hasParentSelector(key);
-
-      if (isParentSelector) {
+      if (hasParentSelector(key)) {
         selector = key.replace(/\&/g, selector);
 
-      } else if (isMediaQuery) {
+      } else if (isMediaQuery(key)) {
         medias.push(key.slice(6).trim());
 
-      } else if (isPseudo) {
+      } else if (isPseudoSelector) {
         selector += key;
 
       } else {
@@ -145,11 +143,11 @@ function generateCombinedMediaQuery(medias: string[]) {
   return `@media ${medias.join(' and ')}`;
 }
 
-export function isPropertyPseudo(property: string) {
+export function isPseudoSelector(property: string) {
   return property.charAt(0) === ':';
 }
 
-function isPropertyMediaQuery(property: string) {
+function isMediaQuery(property: string) {
   return property.substr(0, 6) === '@media';
 }
 

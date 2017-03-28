@@ -1,5 +1,5 @@
 import generateClassName from './libs/generateClassName';
-import cssTextForStyles, { isPropertyPseudo } from './libs/cssTextForStyles';
+import cssTextForStyles, { isPseudoSelector } from './libs/cssTextForStyles';
 import renderCSSText from './libs/renderCSSText';
 import {
   ActiveModes,
@@ -66,7 +66,7 @@ function setClassNamesForStyleRule(
       key = `&.${modeClassName}`;
     }
 
-    if (key.indexOf('&') !== -1 && keys.length && isPropertyPseudo(keys[keys.length - 1])) {
+    if (key.indexOf('&') !== -1 && keys.length && isPseudoSelector(keys[keys.length - 1])) {
       throw new Error(`Cannot have a parent selector as child of pseudo class/element: ${newKeys.join('|')}`);
     }
 
@@ -102,7 +102,7 @@ function getCompiledStyle(className: string, classNamesForModes: {[key: string]:
 
 function substitutePlaceholders(
   styles: StyleDeclaration,
-  classNames: {[k: string]: string },
+  classNames: {[k: string]: string},
 ): StyleDeclaration {
   for (const key in styles) {
     const value = styles[key];
@@ -113,11 +113,17 @@ function substitutePlaceholders(
 
 function _substitutePlaceholders(
   styles: StyleRule,
-  classNames: {[k: string]: string },
+  classNames: {[k: string]: string},
 ): StyleRule {
   for (const key in styles) {
     const value = styles[key];
-    const newKey = key.replace(PLACEHOLDER_REGEX, (_substr: string, p1: string) => classNames[p1]);
+    const newKey = key.replace(PLACEHOLDER_REGEX, (_substr: string, p1: string) => {
+      const className = classNames[p1];
+      if (!className) {
+        throw new Error(`Cannot find StyleRule key ${p1} referenced in placeholder ${key}`);
+      }
+      return className;
+    });
 
     if (newKey !== key) {
       styles[newKey] = value;
