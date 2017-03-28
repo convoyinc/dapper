@@ -53,12 +53,7 @@ describe(`compile`, () => {
       },
     }, { classNamePrefix: 'dap-' });
     expect(className).to.deep.equal({root: 'dap-root-a'});
-    expect(renderCSSTextStub).to.have.been.calledWith(sinon.match((value: string) => {
-      if (!_.isArray(value) || value.length !== 1) {
-        return false;
-      }
-      return /\.dap-root-a\{[^}]+\}/.test(value);
-    }));
+    expect(renderCSSTextStub).to.have.been.calledWith(sinon.match([sinon.match(/^.dap-root-a/)]));
   });
 
   it(`applies plugins`, () => {
