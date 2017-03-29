@@ -8,8 +8,11 @@ let uniqueKeyframeIdentifier = 0;
 
 export type KeyFrames = {[key: string]: StyleRule};
 
-export default function keyframes(keyframe: KeyFrames, config = defaultConfig) {
-  config = { ...defaultConfig, ...config };
+export default function keyframes(
+  keyframe: KeyFrames,
+  configOverride: Partial<Configuration> = defaultConfig,
+) {
+  const config = { ...defaultConfig, ...configOverride } as Configuration;
   const animationName = generateAnimationName(++uniqueKeyframeIdentifier, config);
 
   const cssText = cssifyKeyframe(keyframe, animationName);
