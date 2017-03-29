@@ -13,9 +13,9 @@ const PLACEHOLDER_REGEX = /\{([^\}]+)\}/g;
 
 export default function compile<TKeys extends string>(
   styles: StyleDeclaration<TKeys>,
-  config: Configuration = defaultConfig,
+  configOverride: Partial<Configuration> = defaultConfig,
 ): CompiledStyleSheet<TKeys> {
-  config = { ...defaultConfig, ...config };
+  const config = { ...defaultConfig, ...configOverride } as Configuration;
   const {
     styles: newStyles,
     compiledStyles,
