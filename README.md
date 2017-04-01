@@ -4,7 +4,7 @@
 [![npm (scoped)](https://img.shields.io/npm/v/@convoy/dapper.svg)](https://www.npmjs.com/package/@convoy/dapper)
 
 Dapper is a Javascript/TypeScript styling library ([CSS-in-JS](https://speakerdeck.com/vjeux/react-css-in-js) or CSS-in-TS). It features:
- - Dynamic styles using modes, (i.e. in React it styles based on props and state)
+ - Dynamic styles using modes, (i.e. in React, it styles based on props and state)
  - TypeScript autocomplete and build-time checks
 
  - Utilizes some of the best features of LESS/SASS CSS such as
@@ -25,7 +25,7 @@ Dapper is a Javascript/TypeScript styling library ([CSS-in-JS](https://speakerde
 `npm install @convoy/dapper`
 
 ## TypeScript/Javascript
-Most examples are shown in TypeScript, but dapper works great with Javascript. TypeScript provides autocompletion of your styles and build time checks that those styles exist.
+Most examples are shown in TypeScript, but dapper works great with Javascript. TypeScript provides autocompletion of your styles and at build time checks that those styles exist.
 
 ## React usage
 
@@ -60,7 +60,7 @@ The above generates the following CSS:
 ```
 
 ### Dynamic Styles
-Dapper enables dynamic styles using modes, a series of functions that defines all the different "modes" or ways your component can look. This creates a nice separation of concerns removing a lot of if/else branching logic from your render function.
+Dapper enables dynamic styles using "modes", a series of functions that defines all the different "modes" or ways your component can look. This creates a nice separation of concerns removing a lot of if/else branching logic from your render function.
 
 ```tsx
 import * as dapper from '@convoy/dapper';
@@ -168,12 +168,8 @@ The above generates the following CSS:
 }
 ```
 
-.dapper-parentB-b .dapper-child-c {
-  background-color: blue;
-}
-
 ## Placeholders
-Placeholders allow you to reference other styles names inside of a style rule. This can be helpful for cascading styles. Such as in this example when `child` should look different when inside of `parentA` vs `parentB`.
+Placeholders allow you to reference other styles names inside of a style rule. This can be helpful for cascading styles. Such as in this example, when `child` should look different when inside of `parentA` vs `parentB`.
 
 ```tsx
 import * as dapper from '@convoy/dapper';
@@ -261,8 +257,8 @@ html.wf-loading .dapper-root-a {
 }
 ```
 
-## Hover
-Placeholders and parent selectors makes it easy to support things like styling subelements based on pseudo class selectors of parents, like hover. This helps avoid creating onMouseEnter, onMouseLeave handlers.
+## Hover on parent element
+Placeholders and parent selectors makes it easy to support things like styling child elements based on pseudo class selectors of parents, like hover. This helps avoid creating onMouseEnter, onMouseLeave handlers.
 
 ```tsx
 import * as dapper from '@convoy/dapper';
