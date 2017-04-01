@@ -3,7 +3,7 @@
 [![Codecov](https://img.shields.io/codecov/c/github/convoyinc/dapper.svg)](https://codecov.io/gh/convoyinc/dapper)
 [![npm (scoped)](https://img.shields.io/npm/v/@convoy/dapper.svg)](https://www.npmjs.com/package/@convoy/dapper)
 
-Dapper is a Javascript/TypeScript styling library (CSS-in-JS or CSS-in-TS). It features:
+Dapper is a Javascript/TypeScript styling library ([CSS-in-JS](https://speakerdeck.com/vjeux/react-css-in-js) or CSS-in-TS). It features:
  - Dynamic styles using modes, (i.e. in React it styles based on props and state)
  - TypeScript autocomplete and build-time checks
 
@@ -130,8 +130,50 @@ The above generates the following CSS:
 ```
 and applies clases like `.dapper-input-highlight-b` dynamically to the div if `props.highlight` is `true`.
 
+## Pseudo-selectors and psuedo-elements
+CSS pseudo-selectors, such as `:hover` and `:active` and pseudo-elements such as `::before` and `::after` are supported as you might expect.
+
+```tsx
+import * as dapper from '@convoy/dapper';
+
+const STYLES = dapper.compile({
+  root: {
+    ':hover': {
+      backgroundColor: '#EEE',
+    },
+    '::after': {
+      content: '"+"',
+    },
+  },
+});
+
+export default class Button extends React.Component<Props, State> {
+  styles = dapper.reactTo(this, STYLES);
+
+  render() {
+    return (
+      <div className={this.styles.root} />
+    );
+  }
+}
+```
+The above generates the following CSS:
+```
+.dapper-root-a:hover {
+  background-color: #EEE;
+}
+
+.dapper-root-a::after {
+  content: "+";
+}
+```
+
+.dapper-parentB-b .dapper-child-c {
+  background-color: blue;
+}
+
 ## Placeholders
-Placeholders allow you to reference other styles names inside of a style rule. This can be helpful for cascading styles.
+Placeholders allow you to reference other styles names inside of a style rule. This can be helpful for cascading styles. Such as in this example when `child` should look different when inside of `parentA` vs `parentB`.
 
 ```tsx
 import * as dapper from '@convoy/dapper';
@@ -255,12 +297,12 @@ The above generates the following CSS:
 }
 
 .dapper-root-a:hover .dapper-chil-b {
-  backgroundColor: #EEE;
+  background-color: #EEE;
 }
 ```
 
 ## Media queries
-Dapper supports media queries even nested media queries.
+Dapper supports media queries, including nested media queries.
 ```tsx
 import * as dapper from '@convoy/dapper';
 
@@ -268,8 +310,10 @@ const STYLES = dapper.compile({
   root: {
     width: 200,
     '@media (max-width: 800px)': {
-      width: 100,
-      '@media (max-height: 500px)': {
+      '@media (orientation:landscape)': {
+        width: 100,
+      },
+      '@media (orientation:portrait)': {
         width: 60,
       },
     },
@@ -288,7 +332,19 @@ export default class Button extends React.Component<Props, State> {
 ```
 The above generates the following CSS:
 ```
-TODO...
+.dapper-root-a {
+  width: 200px;
+}
+@media (max-width: 800px) and (orientation:landscape) {
+  .dapper-root-a {
+    width: 100px;
+  }
+}
+@media (max-width: 800px) and (orientation:portrait) {
+  .dapper-root-a {
+    width: 60px;
+  }
+}
 ```
 
 ## Nesting media queries/modes/pseudo
@@ -313,6 +369,35 @@ const STYLES = dapper.compile({
   },
 });
 ```
+The above generates the following CSS:
+```
+.dapper-root-a.dapper-root-small-b {
+  padding: 2px;
+}
+.dapper-root-a.dapper-root-medium-b {
+  padding: 4px;
+}
+.dapper-root-a.dapper-root-large-b {
+  padding: 8px;
+}
+.dapper-root-a:hover {
+  background-color: '#EEE';
+}
+.dapper-root-a:focus {
+  background-color: '#DDD';
+}
+@media (max-width: 500px) {
+  .dapper-root-a {
+    width: 100px;
+  }
+}
+@media (min-width: 500px) {
+  .dapper-root-a {
+    width: 400px;
+  }
+}
+
+```
 
 ## keyframes (CSS Animations)
 Dappers keyframes function generates CSS animation names which can then be referenced in styles.
@@ -335,6 +420,43 @@ const STYLES = dapper.compile({
   },
 });
 ```
+The above generates the following CSS:
+```
+@keyframes dapper-anim-a {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.dapper-root-a {
+  animation: 5s dapper-anim-a linear;
+}
+```
+
+## paddingHorizontal, paddingVertical, marginHorizontal and marginVertical
+Dapper supports easy ways to add the same padding and margin on to the top and bottom or the left and right using paddingHorizontal and paddingVertical or the margin equivalents.
+
+```tsx
+import * as dapper from '@convoy/dapper';
+
+const STYLES = dapper.compile({
+  root: {
+    paddingHorizontal: 4,
+    paddingVertical: 8,
+  },
+});
+```
+The above generates the following CSS:
+```
+.dapper-root-a {
+  paddingLeft: 4px;
+  paddingRight: 4px;
+  paddingTop: 8px;
+  paddingBottom: 8px;
+}
+```
 
 ## renderStatic (arbitrary CSS)
 Sometimes you need to add arbitrary CSS to a document, such as when you are working with a third party library that controls its portion of the DOM tree.
@@ -351,6 +473,20 @@ dapper.renderStatic({
     backgroundColor: '#EEE',
   },
 });
+```
+The above generates the following CSS:
+```
+html, body {
+  background-color: #CCFFFF;
+}
+@media (max-width: 800px) {
+  html, body {
+    background-color: #FFCCFF;
+  }
+}
+.pac-container {
+  background-color: #EEE;
+}
 ```
 
 ## configure (Configuration settings)
@@ -386,7 +522,7 @@ dapper.compile({
 ```
 
 ## compute
-Dapper exposes a `compute` function which takes the output of `compile`, any functions that define the modes and an object that defines the current state to compute the modes with and returns the classnames of the various styles. This function is useful outside of React contexts and when rendering items in a list which have their own modes that aren't based directly on props or state. In React, we primarily use `reactTo`, which is a simple wrapper around `compute` that uses the component as the state to compute modes from.
+Dapper exposes a `compute` function which takes the output of `compile`, any functions that define the modes and an object that defines the current state to compute the modes with and returns the classnames of the various styles. This function is useful even outside of React contexts or when rendering items in a list which have their own modes that aren't based directly on props or state. In React, we primarily use `reactTo`, which is a simple wrapper around `compute` that uses the component as the state to compute modes from.
 
 ```tsx
 import * as dapper from '@convoy/dapper';
