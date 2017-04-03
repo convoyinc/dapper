@@ -292,7 +292,7 @@ The above generates the following CSS:
   padding: 5px;
 }
 
-.dapper-root-a:hover .dapper-chil-b {
+.dapper-root-a:hover .dapper-child-b {
   background-color: #EEE;
 }
 ```
