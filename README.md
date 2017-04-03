@@ -128,7 +128,7 @@ The above generates the following CSS:
   color: red;
 },
 ```
-and applies clases like `.dapper-input-highlight-b` dynamically to the div if `props.highlight` is `true`.
+and applies clases like `.dapper-input-highlight-b` dynamically to the div if `props.highlight` is `true`, and similarly adds `.dapper-input-tooLong-c` to the input when `state.value.length > 8`.
 
 ## Pseudo-selectors and psuedo-elements
 CSS pseudo-selectors, such as `:hover` and `:active` and pseudo-elements such as `::before` and `::after` are supported as you might expect.
