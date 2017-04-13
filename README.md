@@ -531,7 +531,7 @@ const STYLES = dapper.compile({
 
 const ITEM_STYLES = dapper.compile({
   root: {
-    width: 200,
+    backgroundColor: '#CCC',
   },
 });
 
