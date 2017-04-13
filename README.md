@@ -306,10 +306,10 @@ const STYLES = dapper.compile({
   root: {
     width: 200,
     '@media (max-width: 800px)': {
-      '@media (orientation:landscape)': {
+      '@media (orientation: landscape)': {
         width: 100,
       },
-      '@media (orientation:portrait)': {
+      '@media (orientation: portrait)': {
         width: 60,
       },
     },
@@ -331,12 +331,12 @@ The above generates the following CSS:
 .dapper-root-a {
   width: 200px;
 }
-@media (max-width: 800px) and (orientation:landscape) {
+@media (max-width: 800px) and (orientation: landscape) {
   .dapper-root-a {
     width: 100px;
   }
 }
-@media (max-width: 800px) and (orientation:portrait) {
+@media (max-width: 800px) and (orientation: portrait) {
   .dapper-root-a {
     width: 60px;
   }
@@ -447,10 +447,10 @@ const STYLES = dapper.compile({
 The above generates the following CSS:
 ```
 .dapper-root-a {
-  paddingLeft: 4px;
-  paddingRight: 4px;
-  paddingTop: 8px;
-  paddingBottom: 8px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 ```
 
