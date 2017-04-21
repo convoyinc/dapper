@@ -1,4 +1,5 @@
-# Dapper
+<img width="35%" height="35%" src="https://cloud.githubusercontent.com/assets/4240309/25258098/c3c37a1c-25f1-11e7-802f-ca47f7991000.png" />
+
 [![CircleCI](https://img.shields.io/circleci/project/github/convoyinc/dapper.svg)](https://circleci.com/gh/convoyinc/dapper)
 [![Codecov](https://img.shields.io/codecov/c/github/convoyinc/dapper.svg)](https://codecov.io/gh/convoyinc/dapper)
 [![npm (scoped)](https://img.shields.io/npm/v/@convoy/dapper.svg)](https://www.npmjs.com/package/@convoy/dapper)
