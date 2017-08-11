@@ -5,8 +5,10 @@ import compile from './compile';
 import keyframes from './keyframes';
 import renderStatic from './renderStatic';
 import { StyleRule } from './types';
+import { addUnit } from './plugins';
 
 export {
+  addUnit,
   Configuration,
   StyleRule,
   compute,
