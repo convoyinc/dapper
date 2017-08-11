@@ -3,6 +3,8 @@ import prefixer from './prefixer';
 import unit from './unit';
 import { StyleRule } from '../types';
 
+export const addUnit = unit;
+
 export default function apply(style: StyleRule) {
   style = unit(style);
   style = prefixer(style);
