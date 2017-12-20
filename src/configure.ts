@@ -4,6 +4,7 @@ export interface Configuration {
   classNamePrefix: string;
   friendlyClassNames: boolean;
   useInsertRule: boolean;
+  verifyModes: boolean;
 }
 
 export let config: Configuration = Object.freeze({
@@ -11,6 +12,7 @@ export let config: Configuration = Object.freeze({
   classNamePrefix: _.get(process, 'env.NODE_ENV') === 'production' ? 'd-' : 'dapper-',
   friendlyClassNames: _.get(process, 'env.NODE_ENV') !== 'production',
   useInsertRule: _.get(process, 'env.NODE_ENV') === 'production',
+  verifyModes: _.get(process, 'env.NODE_ENV') !== 'production',
 });
 
 export default function configure(cfg: Partial<Configuration>) {

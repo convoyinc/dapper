@@ -1,4 +1,4 @@
-import { CompiledStyleSheet, ComputedStyleSheet, ModeDeclarations } from './types';
+import { StyleDeclaration, ComputedStyleSheet, ModeDeclarations } from './types';
 import compute from './compute';
 
 /**
@@ -10,12 +10,9 @@ import compute from './compute';
  */
 export default function reactTo<TProps, TState, TRules extends string>(
   component: React.Component<TProps, TState>,
-  styles: CompiledStyleSheet<TRules>,
+  styles: StyleDeclaration<TRules>,
   modes?: ModeDeclarations<{ props: TProps, state: TState }>,
 ): ComputedStyleSheet<TRules> {
-  // No modes? No problem!
-  if (!modes) return styles as ComputedStyleSheet<TRules>;
-
   // We keep a reference to a single computed styles object; and are careful to
   // only ever update its properties, rather than make assumptions about what
   // it is named.
