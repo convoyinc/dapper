@@ -33,7 +33,7 @@ dapper.renderStatic({
   },
 });
 
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     display: 'flex',
     backgroundColor: '#BBB',
@@ -73,7 +73,7 @@ const STYLES = dapper.compile({
   text: {
     display: 'inline-block',
   },
-});
+};
 
 const MODES = {
   large: ({ props }: ModeState) => !!props.large,

@@ -6,7 +6,7 @@ export interface BaseState {
   hovered: boolean;
 }
 
-const BASE_STYLES = dapper.compile({
+const BASE_STYLES = {
   root: {
     display: 'inline-block',
     margin: 10,
@@ -18,7 +18,7 @@ const BASE_STYLES = dapper.compile({
       backgroundColor: 'deeppink',
     },
   },
-});
+};
 
 const BASE_MODES = {
   hovered: ({ state }: { state: BaseState }) => state.hovered,

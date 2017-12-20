@@ -8,7 +8,7 @@ proxyquire.noCallThru();
 const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
 
-const {default: compile } = proxyquire('../../src/compile', {
+const {default: compute } = proxyquire('../../src/compute', {
   './libs/renderCSSText': stub,
 });
 
@@ -27,13 +27,12 @@ describe(`configure`, () => {
   it(`friendlyClassNames set to false doesn't add name`, () => {
     configure({ friendlyClassNames: false });
 
-    const className = compile({
+    compute({
       root: {
         backgroundColor: 'red',
         color: 'blue',
       },
     });
-    expect(className).to.deep.equal({root: 'dapper-a'});
     expect(renderCSSTextStub).to.have.been.calledWith(['.dapper-a{background-color:red;color:blue}']);
   });
 });

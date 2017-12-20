@@ -8,12 +8,8 @@ proxyquire.noCallThru();
 const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
 
-const {default: compile } = proxyquire('../../src/compile', {
+const { default: compute } = proxyquire('../../src/compute', {
   './libs/renderCSSText': stub,
-});
-
-const {default: compute } = proxyquire('../../src/compute', {
-  './compile': {default: compile},
 });
 
 describe(`compute`, () => {
@@ -33,14 +29,13 @@ describe(`compute`, () => {
   });
 
   it(`handles mode declarations`, () => {
-    const className = compile({
+    const styles = compute({
       root: {
         $ghost: {
           color: 'red',
         },
       },
-    });
-    const styles = compute(className, {
+    }, {
       ghost: () => true,
     }, {});
     expect(styles['root']).to.equal('dapper-root-a dapper-root-ghost-b');
@@ -50,15 +45,14 @@ describe(`compute`, () => {
   });
 
   it(`allows modes as children of property`, () => {
-    const className = compile({
+    const styles = compute({
       root: {
         color: {
           $red: 'red',
           $blue: 'blue',
         },
       },
-    });
-    const styles = compute(className, {
+    }, {
       red: () => false,
       blue: () => true,
     }, {});
@@ -69,30 +63,229 @@ describe(`compute`, () => {
     ]);
   });
 
-  it(`can directly compute declarations`, () => {
-    const styles = compute({
+  it(`calls renderCSSText with basic cssText`, () => {
+    const className = compute({
       root: {
-        color: 'red',
+        backgroundColor: 'red',
+        color: 'blue',
+        padding: 5,
+        display:'flex',
       },
     });
-    expect(styles['root']).to.equal('dapper-root-a');
-    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
-      '.dapper-root-a{color:red}',
-    ]);
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub).to.have.been.calledWith([`.dapper-root-a{background-color:red;color:blue;padding:5px;` +
+      `display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex}`]);
   });
 
-  it(`throws if given mode declarations but no state`, () => {
-    const className = compile({
+  it(`uses custom configuration`, () => {
+    const className = compute({
       root: {
-        $ghost: {
-          color: 'red',
+        backgroundColor: 'red',
+        color: 'blue',
+        padding: 5,
+        display:'flex',
+      },
+    }, null, null, { classNamePrefix: 'dap-' });
+    expect(className).to.deep.equal({root: 'dap-root-a'});
+    expect(renderCSSTextStub).to.have.been.calledWith(sinon.match([sinon.match(/^.dap-root-a/)]));
+  });
+
+  it(`applies plugins`, () => {
+    const className = compute({
+      root: {
+        padding: 4,
+        flex:1,
+        marginHorizontal: 5,
+        marginVertical: 5,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub).to.have.been.calledWith([
+      `.dapper-root-a{` +
+        `-webkit-flex:1;-ms-flex:1;padding:4px;flex:1;` +
+        `margin-left:5px;margin-right:5px;` +
+        `margin-top:5px;margin-bottom:5px;` +
+        `padding-left:5px;padding-right:5px;` +
+        `padding-top:5px;padding-bottom:5px` +
+      `}`]);
+  });
+
+  it(`applies plugins deeply`, () => {
+    const className = compute({
+      root: {
+        blah: {
+          flex:1,
+          margin: 5,
+          paddingHorizontal: 4,
         },
       },
     });
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub).to.have.been.calledWith([
+      `.dapper-root-a blah{` +
+        `-webkit-flex:1;-ms-flex:1;flex:1;` +
+        `margin:5px;` +
+        `padding-left:4px;padding-right:4px` +
+      `}`]);
+  });
+
+  it(`handles pseudo tags`, () => {
+    const className = compute({
+      root: {
+        ':hover': {
+          color: 'black',
+          '::before': {
+            content: '"a"',
+          },
+        },
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
+      '.dapper-root-a:hover{color:black}',
+      `.dapper-root-a:hover::before{content:"a"}`,
+    ]);
+  });
+
+  it(`handles media queries`, () => {
+    const className = compute({
+      root: {
+        '@media screen and (min-width: 500px)': {
+          color: 'black',
+        },
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
+      '@media screen and (min-width: 500px){.dapper-root-a{color:black}}',
+    ]);
+  });
+
+  it(`handles multiple media queries`, () => {
+    const className = compute({
+      root: {
+        '@media screen and (min-width: 500px)': {
+          '@media (max-width: 800px)': {
+            color: 'black',
+          },
+        },
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
+      '@media screen and (min-width: 500px) and (max-width: 800px){.dapper-root-a{color:black}}',
+    ]);
+  });
+
+  it(`throws if mode declarations but no modes`, () => {
     expect(() => {
-      compute(className, {
-        ghost: () => true,
+      compute({
+        root: {
+          $ghost: {
+            color: 'red',
+          },
+        },
       });
-    }).to.throw;
+    }).to.throw(Error);
+  });
+
+  it(`handles deeply nested styling and renders in order`, () => {
+    const className = compute({
+      root: {
+        color:'blue',
+        ':hover': {
+          color: 'red',
+          '@media (min-width: 100px)': {
+            color: 'green',
+          },
+        },
+        backgroundColor: 'red',
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
+      '.dapper-root-a{color:blue}',
+      '.dapper-root-a:hover{color:red}',
+      '@media (min-width: 100px){.dapper-root-a:hover{color:green}}',
+      '.dapper-root-a{background-color:red}',
+    ]);
+  });
+
+  it(`allows ancestor selectors`, () => {
+    compute({
+      root: {
+        color: {
+          background: 'red',
+        },
+      },
+    });
+
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
+      '.dapper-root-a color{background:red}',
+    ]);
+  });
+
+  it(`throws on invalid object property`, () => {
+    expect(() => {
+      compute({
+        root: {
+          $mode: 'red',
+        },
+      });
+    }).to.throw(Error);
+  });
+
+  it(`handles an array of values`, () => {
+    const className = compute({
+      root: {
+        color:['blue', 'green'],
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a'});
+    expect(renderCSSTextStub.getCall(0)).to.have.been.calledWith([
+      '.dapper-root-a{color:blue;color:green}',
+    ]);
+  });
+
+  it(`supports rule name replacement`, () => {
+    const className = compute({
+      root: {
+        color: 'red',
+      },
+      child: {
+        '{root}:hover &': {
+          color: 'blue',
+        },
+      },
+    });
+    expect(className).to.deep.equal({root: 'dapper-root-a', child: 'dapper-child-b'});
+    expect(renderCSSTextStub).to.have.been.calledWith([
+      `.dapper-root-a{color:red}`,
+      `.dapper-root-a:hover .dapper-child-b{color:blue}`,
+    ]);
+  });
+
+  it(`throws if mode or parent selector is child of pseudo`, () => {
+    expect(() => compute({
+      root: {
+        ':hover': {
+          $mode: {
+            color: 'blue',
+          },
+        },
+      },
+    })).to.throw;
+
+    expect(() => compute({
+      root: {
+        ':hover': {
+          '&.blah': {
+            color: 'blue',
+          },
+        },
+      },
+    })).to.throw;
   });
 });
