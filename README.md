@@ -35,11 +35,11 @@ Most examples are shown in TypeScript, but dapper works great with Javascript. T
 ```tsx
 import * as dapper from '@convoy/dapper';
 
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     padding: 5,
   },
-});
+};
 
 export default class Button extends React.Component<Props, State> {
   styles = dapper.reactTo(this, STYLES);
@@ -74,7 +74,7 @@ interface State {
   value: string;
 }
 
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     backgroundColor: '#EEE',
     $highlight: {
@@ -86,7 +86,7 @@ const STYLES = dapper.compile({
       color: 'red',
     },
   },
-});
+};
 
 const MODES = {
   highlight: ({ props }: { props: Props }) => props.highlight,
@@ -137,7 +137,7 @@ CSS pseudo-selectors, such as `:hover` and `:active` and pseudo-elements such as
 ```tsx
 import * as dapper from '@convoy/dapper';
 
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     ':hover': {
       backgroundColor: '#EEE',
@@ -146,7 +146,7 @@ const STYLES = dapper.compile({
       content: '"+"',
     },
   },
-});
+};
 
 export default class Button extends React.Component<Props, State> {
   styles = dapper.reactTo(this, STYLES);
@@ -175,7 +175,7 @@ Placeholders allow you to reference other styles names inside of a style rule. T
 ```tsx
 import * as dapper from '@convoy/dapper';
 
-const STYLES = dapper.compile({
+const STYLES = {
   parentA: {
     '{child}': {
       backgroundColor: 'red',
@@ -189,7 +189,7 @@ const STYLES = dapper.compile({
   child: {
     padding: 5,
   }
-});
+};
 
 export default class Button extends React.Component<Props, State> {
   styles = dapper.reactTo(this, STYLES);
@@ -230,13 +230,13 @@ The above generates the following CSS:
  ```tsx
 import * as dapper from '@convoy/dapper';
 
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     'html.wf-loading &': {
       opacity: 0,
     },
   },
-});
+};
 
 export default class Button extends React.Component<Props, State> {
   styles = dapper.reactTo(this, STYLES);
@@ -264,7 +264,7 @@ Placeholders and parent selectors makes it easy to support things like styling c
 ```tsx
 import * as dapper from '@convoy/dapper';
 
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     padding: 5,
   },
@@ -273,7 +273,7 @@ const STYLES = dapper.compile({
       backgroundColor: '#EEE',
     },
   },
-});
+};
 
 export default class Button extends React.Component<Props, State> {
   styles = dapper.reactTo(this, STYLES);
@@ -303,7 +303,7 @@ Dapper supports media queries, including nested media queries.
 ```tsx
 import * as dapper from '@convoy/dapper';
 
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     width: 200,
     '@media (max-width: 800px)': {
@@ -315,7 +315,7 @@ const STYLES = dapper.compile({
       },
     },
   },
-});
+};
 
 export default class Button extends React.Component<Props, State> {
   styles = dapper.reactTo(this, STYLES);
@@ -348,7 +348,7 @@ The above generates the following CSS:
 Media queries, modes and pseudo class/element selectors can be nested within CSS properties to make things more readable.
 
 ```js
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     padding: {
       $small: 2,
@@ -364,7 +364,7 @@ const STYLES = dapper.compile({
       '@media (min-width: 500px)': 400,
     },
   },
-});
+};
 ```
 The above generates the following CSS:
 ```
@@ -411,11 +411,11 @@ const fadeOut = dapper.keyframes({
   },
 });
 
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     animation: `5s ${fadeOut} linear`,
   },
-});
+};
 ```
 The above generates the following CSS:
 ```
@@ -438,7 +438,7 @@ Dapper supports easy ways to add the same padding and margin on to the top and b
 ```tsx
 import * as dapper from '@convoy/dapper';
 
-const STYLES = dapper.compile({
+const STYLES = dapper.compute({
   root: {
     paddingHorizontal: 4,
     paddingVertical: 8,
@@ -506,35 +506,40 @@ dapper.configure({
 })
 ```
 
-Configuration can also be used per call to `compile`, `keyframes` and `renderStatic` to override the global configuration. This can be useful when you want to render to a different element which allows you to separately unload those styles.
+Configuration can also be used per call to `compute`, `keyframes` and `renderStatic` to override the global configuration. This can be useful when you want to render to a different element which allows you to separately unload those styles.
 
 ```js
-dapper.compile({
-  root: {
-    padding: 5,
+dapper.compute(
+  {
+    root: {
+      padding: 5,
+    },
   },
-}, {
-  node: document.querySelector('#styles'),
-});
+  null,
+  null,
+  {
+    node: document.querySelector('#styles'),
+  },
+);
 ```
 
 ## compute
-Dapper exposes a `compute` function which takes the output of `compile`, any functions that define the modes and an object that defines the current state to compute the modes with and returns the classnames of the various styles. This function is useful even outside of React contexts or when rendering items in a list which have their own modes that aren't based directly on props or state. In React, we primarily use `reactTo`, which is a simple wrapper around `compute` that uses the component as the state to compute modes from.
+Dapper exposes a `compute` function which takes a plain JS object, any functions that define the modes and an object that defines the current state to compute the modes with and returns the classnames of the various styles. This function is useful even outside of React contexts or when rendering items in a list which have their own modes that aren't based directly on props or state. In React, we primarily use `reactTo`, which is a simple wrapper around `compute` that uses the component as the state to compute modes from.
 
 ```tsx
 import * as dapper from '@convoy/dapper';
 
-const STYLES = dapper.compile({
+const STYLES = {
   root: {
     width: 200,
   },
-});
+};
 
-const ITEM_STYLES = dapper.compile({
+const ITEM_STYLES = {
   root: {
     backgroundColor: '#CCC',
   },
-});
+};
 
 const ITEM_MODES = {
   highlight: (item: Item) => item.highlight,
