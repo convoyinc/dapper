@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 export interface Configuration {
   node: HTMLStyleElement|null;
   classNamePrefix: string;
