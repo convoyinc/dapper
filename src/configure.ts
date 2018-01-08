@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 export interface Configuration {
   node: HTMLStyleElement|null;
   classNamePrefix: string;
@@ -8,9 +7,9 @@ export interface Configuration {
 
 export let config: Configuration = Object.freeze({
   node: null,
-  classNamePrefix: _.get(process, 'env.NODE_ENV') === 'production' ? 'd-' : 'dapper-',
-  friendlyClassNames: _.get(process, 'env.NODE_ENV') !== 'production',
-  useInsertRule: _.get(process, 'env.NODE_ENV') === 'production',
+  classNamePrefix: process.env.NODE_ENV === 'production' ? 'd-' : 'dapper-',
+  friendlyClassNames: process.env.NODE_ENV !== 'production',
+  useInsertRule: process.env.NODE_ENV === 'production',
 });
 
 export default function configure(cfg: Partial<Configuration>) {
