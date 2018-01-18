@@ -6,6 +6,7 @@ declare global {
   namespace NodeJS {
     export interface Global {
       sandbox: sinon.SinonSandbox;
+      document: Document;
     }
   }
 }

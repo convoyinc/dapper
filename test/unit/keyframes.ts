@@ -1,16 +1,8 @@
 import * as sinon from 'sinon';
-import * as proxyquire from 'proxyquire';
 import configure from '../../src/configure';
-import { resetUniqueId } from '../../src/keyframes';
+import { keyframes, resetUniqueId } from '../../src/keyframes';
 
-proxyquire.noCallThru();
-
-const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
-
-const {default: keyframes } = proxyquire('../../src/keyframes', {
-  './libs/renderCSSText': stub,
-});
 
 describe(`keyframes`, () => {
   let renderCSSTextStub: sinon.SinonStub;
@@ -20,7 +12,7 @@ describe(`keyframes`, () => {
   });
 
   beforeEach(() => {
-    renderCSSTextStub = stub.default = sandbox.stub();
+    renderCSSTextStub = sandbox.stub();
     resetUniqueId();
   });
 
@@ -29,7 +21,7 @@ describe(`keyframes`, () => {
   });
 
   it(`calls renderCSSText with basic cssText`, () => {
-    const fadeOut = keyframes({
+    const fadeOut = keyframes(renderCSSTextStub)({
       '0%': {
         opacity: 0,
       },

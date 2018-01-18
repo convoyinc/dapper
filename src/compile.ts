@@ -11,19 +11,22 @@ import { config as defaultConfig, Configuration } from './configure';
 
 const PLACEHOLDER_REGEX = /\{([^\}]+)\}/g;
 
-export default function compile<TKeys extends string>(
-  styles: StyleDeclaration<TKeys>,
-  configOverride: Partial<Configuration> = defaultConfig,
-): CompiledStyleSheet<TKeys> {
-  const config = { ...defaultConfig, ...configOverride } as Configuration;
-  const {
-    styles: newStyles,
-    compiledStyles,
-  } = setClassNamesForStyleDeclaration(styles, config);
-  const cssText = cssTextForStyles(newStyles);
-  renderCSSText(cssText, config);
-  return compiledStyles;
+export function _compile(render: (cssTexts: string[], config: Configuration) => void) {
+  return function compile<TKeys extends string>(
+    styles: StyleDeclaration<TKeys>,
+    configOverride: Partial<Configuration> = defaultConfig,
+  ): CompiledStyleSheet<TKeys> {
+    const config = { ...defaultConfig, ...configOverride } as Configuration;
+    const {
+      styles: newStyles,
+      compiledStyles,
+    } = setClassNamesForStyleDeclaration(styles, config);
+    const cssText = cssTextForStyles(newStyles);
+    render(cssText, config);
+    return compiledStyles;
+  };
 }
+export default _compile(renderCSSText);
 
 // Replaces top level keys with css className text '.keyClassName'
 // Replaces $modes with LESS style parent selector '&.modeClassName'
@@ -89,8 +92,8 @@ function isPropertyMode(property: string) {
   return property.charAt(0) === '$';
 }
 
-function getCompiledClassName(className: string, classNamesForModes: {[key: string]: string}) {
-  if (!Object.keys(classNamesForModes).length) {
+function getCompiledClassName(className: string, classNamesForModes?: {[key: string]: string}) {
+  if (!classNamesForModes || !Object.keys(classNamesForModes).length) {
     return className;
   } else {
     return function styleReducer(modes: ActiveModes) {

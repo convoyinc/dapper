@@ -1,6 +1,8 @@
 import configure, { Configuration } from '../configure';
 
 export default function renderCSSText(cssTexts: string[], config: Configuration) {
+  if (!global.document) return;
+
   let node = config.node;
   if (!node) {
     node = document.createElement('style');

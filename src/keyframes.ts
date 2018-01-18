@@ -8,19 +8,22 @@ let uniqueKeyframeIdentifier = 0;
 
 export type KeyFrames = {[key: string]: StyleRule};
 
-export default function keyframes(
-  keyframe: KeyFrames,
-  configOverride: Partial<Configuration> = defaultConfig,
-) {
-  const config = { ...defaultConfig, ...configOverride } as Configuration;
-  const animationName = generateAnimationName(++uniqueKeyframeIdentifier, config);
+export function keyframes(render: (cssTexts: string[], config: Configuration) => void) {
+  return function keyframes(
+    keyframe: KeyFrames,
+    configOverride: Partial<Configuration> = defaultConfig,
+  ) {
+    const config = { ...defaultConfig, ...configOverride } as Configuration;
+    const animationName = generateAnimationName(++uniqueKeyframeIdentifier, config);
 
-  const cssText = cssifyKeyframe(keyframe, animationName);
+    const cssText = cssifyKeyframe(keyframe, animationName);
 
-  renderCSSText([cssText], config);
+    render([cssText], config);
 
-  return animationName;
+    return animationName;
+  };
 }
+export default keyframes(renderCSSText);
 
 function cssifyKeyframe(frames: KeyFrames, animationName: string) {
   const keyframe = Object

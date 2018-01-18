@@ -3,6 +3,7 @@ export interface Configuration {
   classNamePrefix: string;
   friendlyClassNames: boolean;
   useInsertRule: boolean;
+  validatePosition: boolean;
 }
 
 export let config: Configuration = Object.freeze({
@@ -10,6 +11,7 @@ export let config: Configuration = Object.freeze({
   classNamePrefix: process.env.NODE_ENV === 'production' ? 'd-' : 'dapper-',
   friendlyClassNames: process.env.NODE_ENV !== 'production',
   useInsertRule: process.env.NODE_ENV === 'production',
+  validatePosition: process.env.NODE_ENV !== 'production',
 });
 
 export default function configure(cfg: Partial<Configuration>) {

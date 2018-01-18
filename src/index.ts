@@ -1,20 +1,24 @@
-import reactTo from './reactTo';
+import { addUnit } from './plugins';
+import { StyleRule } from './types';
+import compile from './compile';
 import compute from './compute';
 import configure, { Configuration } from './configure';
-import compile from './compile';
 import keyframes from './keyframes';
+import reactTo from './reactTo';
 import renderStatic from './renderStatic';
-import { StyleRule } from './types';
-import { addUnit } from './plugins';
+import theme from './theme';
+
+export * from './component';
 
 export {
   addUnit,
-  Configuration,
-  StyleRule,
-  compute,
-  configure,
   compile,
+  compute,
+  Configuration,
+  configure,
   keyframes,
   reactTo,
   renderStatic,
+  StyleRule,
+  theme,
 };

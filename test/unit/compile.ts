@@ -1,16 +1,9 @@
 import * as sinon from 'sinon';
-import * as proxyquire from 'proxyquire';
 import configure from '../../src/configure';
 import { resetUniqueId } from '../../src/libs/generateClassName';
+import { _compile } from '../../src/compile';
 
-proxyquire.noCallThru();
-
-const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
-
-const {default: compile } = proxyquire('../../src/compile', {
-  './libs/renderCSSText': stub,
-});
 
 describe(`compile`, () => {
   let renderCSSTextStub: sinon.SinonStub;
@@ -20,7 +13,7 @@ describe(`compile`, () => {
   });
 
   beforeEach(() => {
-    renderCSSTextStub = stub.default = sandbox.stub();
+    renderCSSTextStub = sandbox.stub();
     resetUniqueId();
   });
 
@@ -29,7 +22,7 @@ describe(`compile`, () => {
   });
 
   it(`calls renderCSSText with basic cssText`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         backgroundColor: 'red',
         color: 'blue',
@@ -43,7 +36,7 @@ describe(`compile`, () => {
   });
 
   it(`uses custom configuration`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         backgroundColor: 'red',
         color: 'blue',
@@ -56,7 +49,7 @@ describe(`compile`, () => {
   });
 
   it(`applies plugins`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         padding: 4,
         flex:1,
@@ -78,7 +71,7 @@ describe(`compile`, () => {
   });
 
   it(`applies plugins deeply`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         blah: {
           flex:1,
@@ -97,7 +90,7 @@ describe(`compile`, () => {
   });
 
   it(`handles pseudo tags`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         ':hover': {
           color: 'black',
@@ -115,7 +108,7 @@ describe(`compile`, () => {
   });
 
   it(`handles media queries`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         '@media screen and (min-width: 500px)': {
           color: 'black',
@@ -129,7 +122,7 @@ describe(`compile`, () => {
   });
 
   it(`handles multiple media queries`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         '@media screen and (min-width: 500px)': {
           '@media (max-width: 800px)': {
@@ -145,7 +138,7 @@ describe(`compile`, () => {
   });
 
   it(`handles mode declarations`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         $ghost: {
           color: 'red',
@@ -159,7 +152,7 @@ describe(`compile`, () => {
   });
 
   it(`handles deeply nested styling and renders in order`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         color:'blue',
         ':hover': {
@@ -181,7 +174,7 @@ describe(`compile`, () => {
   });
 
   it(`allows ancestor selectors`, () => {
-    compile({
+    _compile(renderCSSTextStub)({
       root: {
         color: {
           background: 'red',
@@ -196,7 +189,7 @@ describe(`compile`, () => {
 
   it(`throws on invalid object property`, () => {
     expect(() => {
-      compile({
+      _compile(renderCSSTextStub)({
         root: {
           $mode: 'red',
         },
@@ -205,7 +198,7 @@ describe(`compile`, () => {
   });
 
   it(`allows modes as children of property`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         color: {
           $red: 'red',
@@ -221,7 +214,7 @@ describe(`compile`, () => {
   });
 
   it(`handles an array of values`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         color:['blue', 'green'],
       },
@@ -233,7 +226,7 @@ describe(`compile`, () => {
   });
 
   it(`supports rule name replacement`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         color: 'red',
       },
@@ -251,7 +244,7 @@ describe(`compile`, () => {
   });
 
   it(`throws if mode or parent selector is child of pseudo`, () => {
-    expect(() => compile({
+    expect(() => _compile(renderCSSTextStub)({
       root: {
         ':hover': {
           $mode: {
@@ -261,7 +254,7 @@ describe(`compile`, () => {
       },
     })).to.throw;
 
-    expect(() => compile({
+    expect(() => _compile(renderCSSTextStub)({
       root: {
         ':hover': {
           '&.blah': {

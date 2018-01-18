@@ -1,22 +1,15 @@
 import * as sinon from 'sinon';
-import * as proxyquire from 'proxyquire';
 import configure from '../../src/configure';
 import { resetUniqueId } from '../../src/libs/generateClassName';
+import { _compile } from '../../src/compile';
 
-proxyquire.noCallThru();
-
-const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
-
-const {default: compile } = proxyquire('../../src/compile', {
-  './libs/renderCSSText': stub,
-});
 
 describe(`configure`, () => {
   let renderCSSTextStub: sinon.SinonStub;
 
   beforeEach(() => {
-    renderCSSTextStub = stub.default = sandbox.stub();
+    renderCSSTextStub = sandbox.stub();
     resetUniqueId();
   });
 
@@ -27,7 +20,7 @@ describe(`configure`, () => {
   it(`friendlyClassNames set to false doesn't add name`, () => {
     configure({ friendlyClassNames: false });
 
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         backgroundColor: 'red',
         color: 'blue',

@@ -1,10 +1,14 @@
 import * as chai from 'chai';
 import * as sinon from 'sinon';
 import * as sinonChai from 'sinon-chai';
+import * as Enzyme from 'enzyme';
+import * as Adapter from 'enzyme-adapter-react-15';
 
 import { withMocha } from '../helpers';
 
 import './base';
+
+Enzyme.configure({ adapter: new Adapter() });
 
 // Chai
 

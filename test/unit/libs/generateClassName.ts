@@ -1,22 +1,14 @@
 import * as _ from 'lodash';
-import * as proxyquire from 'proxyquire';
-import { config as defaultConfig } from '../../../src/configure';
-
-proxyquire.noCallThru();
-
-const config: any = {};
-
-const {default: generateClassName } = proxyquire('../../../src/libs/generateClassName', {
-  '../configure': {
-    config,
-  },
-});
+import { default as configure, config as defaultConfig } from '../../../src/configure';
+import generateClassName from '../../../src/libs/generateClassName';
 
 describe(`libs/generateClassName`, () => {
 
   beforeEach(() => {
-    config.friendlyClassNames = true;
-    config.classNamePrefix = 'dapper-';
+    configure({
+      friendlyClassNames: true,
+      classNamePrefix: 'dapper-',
+    });
   });
 
   describe(`generateClassName`, () => {

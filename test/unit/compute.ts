@@ -1,20 +1,10 @@
 import * as sinon from 'sinon';
-import * as proxyquire from 'proxyquire';
 import configure from '../../src/configure';
 import { resetUniqueId } from '../../src/libs/generateClassName';
+import { _compile } from '../../src/compile';
+import { _compute } from '../../src/compute';
 
-proxyquire.noCallThru();
-
-const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
-
-const {default: compile } = proxyquire('../../src/compile', {
-  './libs/renderCSSText': stub,
-});
-
-const {default: compute } = proxyquire('../../src/compute', {
-  './compile': {default: compile},
-});
 
 describe(`compute`, () => {
   let renderCSSTextStub: sinon.SinonStub;
@@ -24,7 +14,7 @@ describe(`compute`, () => {
   });
 
   beforeEach(() => {
-    renderCSSTextStub = stub.default = sandbox.stub();
+    renderCSSTextStub = sandbox.stub();
     resetUniqueId();
   });
 
@@ -33,14 +23,14 @@ describe(`compute`, () => {
   });
 
   it(`handles mode declarations`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         $ghost: {
           color: 'red',
         },
       },
     });
-    const styles = compute(className, {
+    const styles = _compute(renderCSSTextStub)(className, {
       ghost: () => true,
     }, {});
     expect(styles['root']).to.equal('dapper-root-a dapper-root-ghost-b');
@@ -50,7 +40,7 @@ describe(`compute`, () => {
   });
 
   it(`allows modes as children of property`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         color: {
           $red: 'red',
@@ -58,7 +48,7 @@ describe(`compute`, () => {
         },
       },
     });
-    const styles = compute(className, {
+    const styles = _compute(renderCSSTextStub)(className, {
       red: () => false,
       blue: () => true,
     }, {});
@@ -70,7 +60,7 @@ describe(`compute`, () => {
   });
 
   it(`can directly compute declarations`, () => {
-    const styles = compute({
+    const styles = _compute(renderCSSTextStub)({
       root: {
         color: 'red',
       },
@@ -82,7 +72,7 @@ describe(`compute`, () => {
   });
 
   it(`throws if given mode declarations but no state`, () => {
-    const className = compile({
+    const className = _compile(renderCSSTextStub)({
       root: {
         $ghost: {
           color: 'red',
@@ -90,7 +80,7 @@ describe(`compute`, () => {
       },
     });
     expect(() => {
-      compute(className, {
+      _compute(renderCSSTextStub)(className, {
         ghost: () => true,
       });
     }).to.throw;

@@ -1,16 +1,9 @@
 import * as sinon from 'sinon';
-import * as proxyquire from 'proxyquire';
 import configure from '../../src/configure';
 import { resetUniqueId } from '../../src/libs/generateClassName';
+import { renderStatic } from '../../src/renderStatic';
 
-proxyquire.noCallThru();
-
-const stub = { default: null as any };
 const sandbox = sinon.sandbox.create();
-
-const {default: renderStatic } = proxyquire('../../src/renderStatic', {
-  './libs/renderCSSText': stub,
-});
 
 describe(`renderStatic`, () => {
   let renderCSSTextStub: sinon.SinonStub;
@@ -20,7 +13,7 @@ describe(`renderStatic`, () => {
   });
 
   beforeEach(() => {
-    renderCSSTextStub = stub.default = sandbox.stub();
+    renderCSSTextStub = sandbox.stub();
     resetUniqueId();
   });
 
@@ -29,7 +22,7 @@ describe(`renderStatic`, () => {
   });
 
   it(`calls renderCSSText with basic cssText`, () => {
-    renderStatic({
+    renderStatic(renderCSSTextStub)({
       'html, body': {
         backgroundColor: 'red',
         color: 'blue',
@@ -39,7 +32,7 @@ describe(`renderStatic`, () => {
   });
 
   it(`handles class names`, () => {
-    renderStatic({
+    renderStatic(renderCSSTextStub)({
       '.hello': {
         backgroundColor: 'red',
         color: 'blue',
@@ -49,7 +42,7 @@ describe(`renderStatic`, () => {
   });
 
   it(`handles cascading selectors`, () => {
-    renderStatic({
+    renderStatic(renderCSSTextStub)({
       h1: {
         '.dude': {
           padding: 5,
@@ -60,7 +53,7 @@ describe(`renderStatic`, () => {
   });
 
   it(`handles cascading selectors with multiple parent selectors`, () => {
-    renderStatic({
+    renderStatic(renderCSSTextStub)({
       h1: {
         '&.blah': {
           '.dude': {
@@ -75,7 +68,7 @@ describe(`renderStatic`, () => {
   });
 
   it(`handles parent selectors`, () => {
-    renderStatic({
+    renderStatic(renderCSSTextStub)({
       h1: {
         '&.blah': {
           backgroundColor: 'red',
@@ -86,7 +79,7 @@ describe(`renderStatic`, () => {
   });
 
   it(`handles parent selectors as children of property`, () => {
-    renderStatic({
+    renderStatic(renderCSSTextStub)({
       h1: {
         padding: {
           '&.blah': 4,
@@ -99,14 +92,14 @@ describe(`renderStatic`, () => {
 
   it(`Errors on no selector`, () => {
     expect(() => {
-      renderStatic({
+      renderStatic(renderCSSTextStub)({
         padding: 5,
-      });
+      } as any);
     }).to.throw(Error);
   });
 
   it.skip(`Handles classnames as children of property`, () => {
-    renderStatic({
+    renderStatic(renderCSSTextStub)({
       h1: {
         padding: {
           '.blah': 4,
@@ -117,7 +110,7 @@ describe(`renderStatic`, () => {
   });
 
   it(`Handles pseudo classes`, () => {
-    renderStatic({
+    renderStatic(renderCSSTextStub)({
       h1: {
         ':hover': {
           padding: 4,
