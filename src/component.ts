@@ -13,13 +13,13 @@ export {
   Modes,
 }
 
-interface DapperComponentProps {
-  style?: CSSProperties;
+export interface DapperComponentProps {
+  style?: React.CSSProperties;
   className?: string;
 }
 
 export function _component(render: (cssTexts: string[], config: Configuration) => void) {
-  return function component<TModes extends string, TProps extends DapperComponentProps>(
+  return function component<TProps extends DapperComponentProps, TModes extends string>(
     nodeName: string | React.ComponentClass,
     displayName: string,
     styleRule: StyleRule,
@@ -99,8 +99,12 @@ export function _position(render: (cssTexts: string[], config: Configuration) =>
 export const position = _position(renderCSSText);
 
 function nc<TProps>(nodeName: string) {
-  return function <TModes extends string>(displayName: string, styleRule: StyleRule, modes?: Modes<TModes>) {
-    return component<TProps>(nodeName, displayName, styleRule, modes);
+  return function <TModes extends string>(
+    displayName: string,
+    styleRule: StyleRule,
+    modes?: Modes<TModes>,
+  ) {
+    return component<TProps, TModes>(nodeName, displayName, styleRule, modes);
   };
 }
 

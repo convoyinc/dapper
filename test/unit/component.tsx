@@ -4,6 +4,7 @@ import { shallow } from 'enzyme';
 import configure from '../../src/configure';
 import { resetUniqueId } from '../../src/libs/generateClassName';
 import * as dapper from '../../src';
+import renderCSSText from '../../src/libs/renderCSSText';
 
 describe(`component`, () => {
   let renderCSSTextStub: sinon.SinonStub;
@@ -22,25 +23,32 @@ describe(`component`, () => {
   });
 
   it(`div`, () => {
-    // Same as: const Root = dapper.div('ButtonRoot', {
-    const Root = dapper._component<React.HTMLAttributes<HTMLDivElement>>(renderCSSTextStub)('div', 'ButtonRoot',
-      {
-        padding: 5,
-        backgroundColor: 'blue',
-        '@media (min-width: 500)': {
-          padding: 2,
+    // Same as: dapper.div('ButtonRoot' ...) but needed to
+    // inject renderCSSText
+    // const component = dapper._component(renderCSSText);
+    // const Root = component<
+    //   React.HTMLAttributes<HTMLDivElement>,
+    //   'small'|'color'
+    //  >('div', 'ButtonRoot',
+    const Root = dapper.div('ButtonRoot', {
+      padding: 5,
+      backgroundColor: {
+        $blue: 'blue',
+        $red: 'red',
+      },
+      '@media (min-width: 500)': {
+        padding: 2,
+      },
+      $small: {
+        $bright: {
+          outline: 'yellow',
         },
       },
-      {
-        small: {
-          fontSize: 12,
-        },
-        color: {
-          color: (c: string) => c,
-          backgroundColor: (c: string) => c,
-        },
+      $color: {
+        color: (c: string) => c,
+        backgroundColor: (c: string) => c,
       },
-    );
+    });
 
     expect(renderCSSTextStub).to.have.been.calledWith([
       `.dapper-ButtonRoot-a{padding:5px;background-color:blue}`,
@@ -59,8 +67,13 @@ describe(`component`, () => {
 
   it(`input`, () => {
 
-    // Same as: const Root = dapper.input('Input', {
-    const Input = dapper._component<React.HTMLAttributes<HTMLInputElement>>(renderCSSTextStub)('input', 'Input',
+    // Same as: dapper.input('Input' ...) but needed to
+    // inject renderCSSText
+    const component = dapper._component(renderCSSText);
+    const Input = component<
+      React.HTMLAttributes<HTMLInputElement>,
+      'small'|'color'
+     >('input', 'Input',
       {
         padding: 5,
         backgroundColor: 'blue',
@@ -89,7 +102,7 @@ describe(`component`, () => {
 
     function onBlur() {}
 
-    const wrapper = shallow(<Input onBlur={onBlur} small color='#455' />);
+    const wrapper = shallow(<Input onBlur={onBlur} color small />);
     expect(wrapper.html()).to.equal(`<input ` +
       `style="color:#455;background-color:#455;" ` +
       `class="dapper-Input-a dapper-Input-small-b dapper-Input-color-c">` +
@@ -113,7 +126,7 @@ describe(`component`, () => {
           flexAlign: 'self',
         },
         color: {
-          color: (c: string) => c,
+          color: (props:any) => props.color,
           backgroundColor: (c: string) => c,
         },
       },
@@ -125,6 +138,16 @@ describe(`component`, () => {
       },
     );
 
-    return <Positioned small color='#445' h />;
+    return <Positioned small color='#445' />;
   });
 });
+
+// TODO: function rules should get all props not just the one,
+// TODO: can't nest modes, go back to $?
+// TODO: can't put modes as children of css property (i.e. color: { $blue: ..., $red: ... })
+// TODO: put media queries/pseudos as child of css property
+// TODO: put _styles as static on class
+// TODO: put className as static on class
+// TODO: ensure parent selector still works
+// TODO: ensure nested media queries still works
+// TODO: put arbitrary classNames
