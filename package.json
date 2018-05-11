@@ -43,6 +43,7 @@
     "@types/react-dom": "0.14.21",
     "@types/sinon": "1.16.33",
     "@types/sinon-chai": "2.7.27",
+    "@types/tapable": "^0.2.3",
     "@types/webpack": "2.2.4",
     "chai": "3.5.0",
     "classnames": "2.2.5",
