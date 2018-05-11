@@ -11,7 +11,16 @@ export default function renderCSSText(cssTexts: string[], config: Configuration)
   if (config.useInsertRule) {
     const sheet = node.sheet as CSSStyleSheet;
     cssTexts.forEach(cssText => {
-      sheet.insertRule(cssText, sheet.cssRules.length);
+      // Gracefully continue despite invalid CSS rules in production
+      try {
+        sheet.insertRule(cssText, sheet.cssRules.length);
+      } catch (e) {
+        if (process.env.NODE_ENV === 'production') {
+          console.error(e); // tslint:disable-line
+        } else {
+          throw e;
+        }
+      }
     });
   } else {
     node.textContent += cssTexts.join('\n') + '\n';
