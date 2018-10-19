@@ -6,7 +6,7 @@ import { StyleRule, StyleDeclaration } from '../types';
 
 interface ValueAndPath {
   path: string[];
-  value: string|number;
+  value: string|number|undefined;
 }
 
 const CSS_PROPERTY_REGEX = /^-?[_a-z][_a-z0-9-]*$/i;

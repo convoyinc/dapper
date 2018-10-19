@@ -8,7 +8,7 @@ export default function addUnit(style: StyleRule, unit = 'px') {
 
     const cssValue = style[property];
     if (Array.isArray(cssValue)) {
-      style[property] = cssValue.map(val => addUnitIfNeeded(val, unit));
+      style[property] = cssValue.map(val => addUnitIfNeeded(val, unit) as string | number);
     } else if (typeof cssValue === 'object') {
       style[property] = addUnit(cssValue as StyleRule, unit);
     } else {
@@ -19,7 +19,7 @@ export default function addUnit(style: StyleRule, unit = 'px') {
   return style;
 }
 
-function addUnitIfNeeded(value: string|number, unit: string) {
+function addUnitIfNeeded(value: string|number|undefined, unit: string) {
   if (typeof value === 'number') {
     return value + unit;
   }
