@@ -5,8 +5,7 @@ import { config as defaultConfig } from '../../../src/configure';
 proxyquire.noCallThru();
 
 const config: any = {};
-
-const {default: generateClassName } = proxyquire('../../../src/libs/generateClassName', {
+const { default: generateClassName } = proxyquire('../../../src/libs/generateClassName', {
   '../configure': {
     config,
   },
