@@ -497,6 +497,10 @@ Dapper works out of the box without any configuration needed. The default config
 
 `useInsertRule` (optional): A flag dictating that when rendering to the style element whether to use CSSStyleSheet.insertRule or innerHTML. Using insertRule is faster because it means the browser has less to repeatedly parse, but is more difficult to inspect using browser dev tools. Default if `process.env.NODE_ENV === 'production'` is `true`, otherwise the default is `false`.
 
+`omitUniqueSuffices` (optional): A flag allowing unique suffix generation to be turned off. Useful for snapshot testing, e.g.:
+
+![image](./omitUniqueSuffices.png)
+
 ```js
 dapper.configure({
   node: document.querySelector('#stylesheet'),
