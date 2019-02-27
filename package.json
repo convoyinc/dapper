@@ -25,6 +25,7 @@
     "test:unit": "./scripts/test:unit.sh"
   },
   "dependencies": {
+    "crypto": "^1.0.1",
     "hyphenate-style-name": "^1.0.2",
     "inline-style-prefixer": "^2.0.5",
     "lodash": "^4.17.4",

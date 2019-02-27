@@ -1,13 +1,20 @@
 import { Configuration } from '../configure';
+import {
+  StyleRuleValue,
+} from '../types';
+import createStableSuffix from '../createStableSuffix';
 
 let uniqueRuleIdentifier = 0;
 
 const CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const CHAR_LENGTH = CHARS.length;
 
-export default function generateClassName(ids: string[], config: Configuration) {
+export default function generateClassName(ids: string[], value: StyleRuleValue, config: Configuration) {
   const friendlyName = config.friendlyClassNames ? ids.map(id => `${id}-`).join('') : '';
-  return config.classNamePrefix + friendlyName + _generateClassName(++uniqueRuleIdentifier);
+  const suffix = config.stableSuffices
+    ? createStableSuffix({ ids, value }, config)
+    : _generateClassName(++uniqueRuleIdentifier);
+  return config.classNamePrefix + friendlyName + suffix;
 }
 
 function _generateClassName(id: number, className = ''): string {

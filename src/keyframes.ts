@@ -3,6 +3,7 @@ import { StyleRule } from './types';
 import renderCSSText from './libs/renderCSSText';
 import generateCSSDeclaration from './libs/generateCSSDeclaration';
 import applyPlugins from './plugins';
+import createStableSuffix from './createStableSuffix';
 
 let uniqueKeyframeIdentifier = 0;
 
@@ -13,7 +14,7 @@ export default function keyframes(
   configOverride: Partial<Configuration> = defaultConfig,
 ) {
   const config = { ...defaultConfig, ...configOverride } as Configuration;
-  const animationName = generateAnimationName(++uniqueKeyframeIdentifier, config);
+  const animationName = generateAnimationName(keyframe, config);
 
   const cssText = cssifyKeyframe(keyframe, animationName);
 
@@ -30,8 +31,11 @@ function cssifyKeyframe(frames: KeyFrames, animationName: string) {
   return `@keyframes ${animationName}{${keyframe}}`;
 }
 
-function generateAnimationName(id: number, config: Configuration) {
-  return `${config.classNamePrefix}anim-${id}`;
+function generateAnimationName(keyframe: KeyFrames, config: Configuration) {
+  const suffix = config.stableSuffices
+    ? createStableSuffix({ keyframe }, config)
+    : ++uniqueKeyframeIdentifier;
+  return `${config.classNamePrefix}anim-${suffix}`;
 }
 
 function cssifyObject(style: StyleRule) {

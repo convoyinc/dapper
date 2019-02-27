@@ -9,11 +9,13 @@
  */
 export type StyleValue = number|string;
 
+export type StyleRuleValue = StyleValue | StyleValue[] | StyleRule | undefined;
+
 /**
  * An individual style rule, containing CSS property declarations (with JS-style
  * property names), as well as other nested rules.
  */
-export type StyleRule = { [key: string]: StyleValue | StyleValue[] | StyleRule | undefined };
+export type StyleRule = { [key: string]: StyleRuleValue };
 
 /**
  * A collection of style rules represented by JavaScript Objects, which are

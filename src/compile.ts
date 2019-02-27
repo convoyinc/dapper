@@ -38,7 +38,7 @@ function setClassNamesForStyleDeclaration<TKeys extends string>(
   for (const key in styles) {
     const classNamesForModes: {[k: string]: string} = {};
     const value = styles[key];
-    const name = generateClassName([key], config);
+    const name = generateClassName([key], value, config);
     const newKey = `.${name}`;
 
     newStyles[newKey] = setClassNamesForStyleRule([key], value, classNamesForModes, config);
@@ -66,7 +66,7 @@ function setClassNamesForStyleRule(
       newKeys = keys.concat(mode);
       let modeClassName = classNamesForModes[mode];
       if (!modeClassName) {
-        modeClassName = classNamesForModes[mode] = generateClassName(newKeys, config);
+        modeClassName = classNamesForModes[mode] = generateClassName(newKeys, value, config);
       }
       key = `&.${modeClassName}`;
     }
