@@ -7,7 +7,8 @@ const CHAR_LENGTH = CHARS.length;
 
 export default function generateClassName(ids: string[], config: Configuration) {
   const friendlyName = config.friendlyClassNames ? ids.map(id => `${id}-`).join('') : '';
-  return config.classNamePrefix + friendlyName + _generateClassName(++uniqueRuleIdentifier);
+  const suffix = config.omitUniqueSuffices ? '' : _generateClassName(++uniqueRuleIdentifier);
+  return config.classNamePrefix + friendlyName + suffix;
 }
 
 function _generateClassName(id: number, className = ''): string {
