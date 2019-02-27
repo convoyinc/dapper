@@ -31,8 +31,8 @@ function cssifyKeyframe(frames: KeyFrames, animationName: string) {
 }
 
 function generateAnimationName(config: Configuration) {
-  const suffix = config.omitUniqueSuffices ? '' : ++uniqueKeyframeIdentifier;
-  return `${config.classNamePrefix}anim-${suffix}`;
+  const suffix = config.omitUniqueSuffices ? '' : `-${++uniqueKeyframeIdentifier}`;
+  return `${config.classNamePrefix}anim${suffix}`;
 }
 
 function cssifyObject(style: StyleRule) {

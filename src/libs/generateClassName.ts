@@ -6,9 +6,14 @@ const CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const CHAR_LENGTH = CHARS.length;
 
 export default function generateClassName(ids: string[], config: Configuration) {
-  const friendlyName = config.friendlyClassNames ? ids.map(id => `${id}-`).join('') : '';
-  const suffix = config.omitUniqueSuffices ? '' : _generateClassName(++uniqueRuleIdentifier);
-  return config.classNamePrefix + friendlyName + suffix;
+  const friendlyName = config.friendlyClassNames ? ids.join('-') : '';
+  return `${config.classNamePrefix}${friendlyName}${_generateSuffix(config)}`;
+}
+
+function _generateSuffix(config: Configuration) {
+  if (config.omitUniqueSuffices) return '';
+  const uniqueSuffix = _generateClassName(++uniqueRuleIdentifier);
+  return config.friendlyClassNames ? `-${uniqueSuffix}` : uniqueSuffix;
 }
 
 function _generateClassName(id: number, className = ''): string {

@@ -40,6 +40,11 @@ describe(`configure`, () => {
   });
 
   it(`omitUniqueSuffices omits unique sufficies for class names and keyframes`, () => {
+    configure({
+      friendlyClassNames: true,
+      omitUniqueSuffices: false,
+    });
+
     const fadeOut1 = keyframes({
       '0%': {
         opacity: 0,
@@ -55,9 +60,12 @@ describe(`configure`, () => {
       },
     });
     expect(fadeOut1).to.equal('dapper-anim-1');
-    expect(className1).to.deep.equal({root: 'dapper-a'});
+    expect(className1).to.deep.equal({root: 'dapper-root-a'});
 
-    configure({ omitUniqueSuffices: true });
+    configure({
+      friendlyClassNames: true,
+      omitUniqueSuffices: true,
+    });
 
     const fadeOut2 = keyframes({
       '0%': {
@@ -73,7 +81,7 @@ describe(`configure`, () => {
         color: 'blue',
       },
     });
-    expect(fadeOut2).to.equal('dapper-anim-');
-    expect(className2).to.deep.equal({root: 'dapper-'});
+    expect(fadeOut2).to.equal('dapper-anim');
+    expect(className2).to.deep.equal({root: 'dapper-root'});
   });
 });
