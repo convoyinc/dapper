@@ -13,7 +13,7 @@ export default function keyframes(
   configOverride: Partial<Configuration> = defaultConfig,
 ) {
   const config = { ...defaultConfig, ...configOverride } as Configuration;
-  const animationName = generateAnimationName(++uniqueKeyframeIdentifier, config);
+  const animationName = generateAnimationName(config);
 
   const cssText = cssifyKeyframe(keyframe, animationName);
 
@@ -30,8 +30,9 @@ function cssifyKeyframe(frames: KeyFrames, animationName: string) {
   return `@keyframes ${animationName}{${keyframe}}`;
 }
 
-function generateAnimationName(id: number, config: Configuration) {
-  return `${config.classNamePrefix}anim-${id}`;
+function generateAnimationName(config: Configuration) {
+  const suffix = config.omitUniqueSuffices ? '' : `-${++uniqueKeyframeIdentifier}`;
+  return `${config.classNamePrefix}anim${suffix}`;
 }
 
 function cssifyObject(style: StyleRule) {
