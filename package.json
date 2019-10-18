@@ -29,7 +29,7 @@
     "inline-style-prefixer": "^2.0.5",
     "lodash": "^4.17.4",
     "tslib": "^1.4.0",
-    "unitless-css-property": "^1.0.2"
+    "@convoy/unitless-css-property": "1.0.4"
   },
   "devDependencies": {
     "@types/chai": "3.4.34",
